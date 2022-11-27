@@ -18,7 +18,6 @@ Factors to consider -
 
 Scenario and Purpose:
 
-The purpose of this project is to determine the insurance premium rate of a renter's insurance based on the factors
 
 
 1. Decide which variables to generate using pseudo random generator: claims amount, claims probability

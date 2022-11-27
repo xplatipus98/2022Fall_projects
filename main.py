@@ -11,14 +11,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from random import randint
 import warnings
-
 warnings.filterwarnings("ignore")
 
 
 def dict_generator():
     """
-
-    :return:
+    This function generates a list of dictionary with key as the bucket of that variable and value as its
+    relativity
+    :return: List of dictionaries
     """
     age = {"18-24 years": 1.5, "25-45 years": 1, "45-60 years": 1.3,
            "60+ years": 1.6}
@@ -76,7 +76,7 @@ def create_df(number_of_customers):
     return fm_dataframe
 
 
-def calculate_premium(dataframe, n):
+def calculate_premium(dataframe):
     """
     This function returns the total insurance premium of n customers based on their relativity of each variable that
     we have considered
@@ -84,6 +84,8 @@ def calculate_premium(dataframe, n):
     :param n: No. of customers
     :return: total insurance premium
     """
+    base_premium = 1600
+    total_premium = dataframe['']
 
 
 if __name__ == '__main__':
