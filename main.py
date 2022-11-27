@@ -9,9 +9,11 @@ SPARSH SADAFAL
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import random
+from random import randint
 import warnings
+
 warnings.filterwarnings("ignore")
+
 
 def dict_generator():
     """
@@ -54,22 +56,23 @@ def create_df(number_of_customers):
     Creates a dataframe with values of all the variables being considered for the auto insurance financial model
     :return: dataframe with relativity of all the variables
     """
-    data = []
     column_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless', 'Driving_History_speeding' 'Credit_Score',
                     'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
                     'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
     fm_dataframe = pd.DataFrame(columns=column_names)
     for i in range(0, number_of_customers):
+        data = []
         for info_dict in dict_generator():
-            x = np.random.randint(0, len(info_dict)-1)
-            key = list(info_dict)[x]
-            data.append(info_dict[key])
-        fm_dataframe = fm_dataframe.append({"Age": data[0], "Driving_History_DUI": data[1], "Driving_History_reckless": data[2],
-                                 "Driving_History_speeding": data[3], "Credit_Score": data[4],
-                                 "Years_of_Driving": data[5], "Location": data[6], "Insurance_History": data[7],
-                                 "Annual_Mileage": data[8], "Marital_Status": data[9],
-                                 "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
-                                 "Vehicle": data[13]}, ignore_index=True)
+            x = np.random.randint(0, len(info_dict))
+            value = list(info_dict.values())[x]
+            data.append(value)
+        fm_dataframe = fm_dataframe.append(
+            {"Age": data[0], "Driving_History_DUI": data[1], "Driving_History_reckless": data[2],
+             "Driving_History_speeding": data[3], "Credit_Score": data[4],
+             "Years_of_Driving": data[5], "Location": data[6], "Insurance_History": data[7],
+             "Annual_Mileage": data[8], "Marital_Status": data[9],
+             "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
+             "Vehicle": data[13]}, ignore_index=True)
     return fm_dataframe
 
 
