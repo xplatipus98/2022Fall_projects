@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from random import randint
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
@@ -20,8 +21,8 @@ def dict_generator():
     relativity
     :return: List of dictionaries
     """
-    age = {"18-24 years": 1.5, "25-45 years": 1, "45-60 years": 1.3,
-           "60+ years": 1.6}
+    age = {"18-24 years": 1.2, "25-45 years": 1, "45-60 years": 1.15,
+           "60+ years": 1.25}
     driving_hist_dui = {"No": 1, "Yes": 1.2}
     driving_hist_reckless = {"No": 1, "Yes": 1.1}
     driving_hist_speeding = {"No": 1, "Yes": 1.05}
@@ -35,12 +36,12 @@ def dict_generator():
     annual_mileage = {"0-7500 miles": 1, "7500-10000 miles": 1.1,
                       "10001-15000 miles": 1.15, "15000+ miles": 1.2}
     marital_status = {"Married": 0.95, "Single/Divorced/Widowed": 1}
-    claims_hist = {"Filed within last 1 year": 1.3, "Filed within last 1-3 years": 1.2,
+    claims_hist = {"Filed within last 1 year": 1.25, "Filed within last 1-3 years": 1.15,
                    "No claims filed": 1}
-    coverage_level = {"10-20k": 0.9, "20k-30k": 0.95, "30k-40k": 1, "40k-50k": 1.05,
-                      "50-60k": 1.1, "60k-70k": 1.15, "70k-80k": 1.2, "80k-90k": 1.25,
-                      "90k-100k": 1.3, "100k-110k": 1.35, "110-120k": 1.4, "120k-130k": 1.45,
-                      "130k-140k": 1.5, "140k-150k": 1.55}
+    coverage_level = {"10-20k": 0.94, "20k-30k": 0.97, "30k-40k": 1, "40k-50k": 1.05,
+                      "50-60k": 1.09, "60k-70k": 1.12, "70k-80k": 1.15, "80k-90k": 1.18,
+                      "90k-100k": 1.22, "100k-110k": 1.25, "110-120k": 1.28, "120k-130k": 1.32,
+                      "130k-140k": 1.35, "140k-150k": 1.38}
     deductible = {"No deductible": 1.2, "$250": 1, "$500": 0.9, "$1000": 0.8}
     vehicle_safety = {"0 NCAP": 1.15, "1 NCAP": 1.1, "2 NCAP": 1.05, "3 NCAP": 1,
                       "4 NCAP": 0.95, "5 NCAP": 0.9}
@@ -73,19 +74,25 @@ def create_df(number_of_customers):
              "Annual_Mileage": data[8], "Marital_Status": data[9],
              "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
              "Vehicle": data[13]}, ignore_index=True)
-    return fm_dataframe
+    calculate_premium(fm_dataframe)
 
 
-def calculate_premium(dataframe):
+def calculate_premium(dataframe, n):
     """
     This function returns the total insurance premium of n customers based on their relativity of each variable that
     we have considered
+    :param df:
     :param dataframe: dataframe with relativities of all the factors affecting insurance premium
     :param n: No. of customers
     :return: total insurance premium
     """
-    base_premium = 1600
-    total_premium = dataframe['']
+    baseline_premium = 1600
+    df['Calculated_premium'] = baseline_premium*df['Age']*df['Driving_History_DUI']*df['Driving_History_reckless']*\
+                               df['Driving_History_speeding']*df['Credit_Score']*df['Years_of_Driving']*df['Location']*\
+                               df['Insurance_History']*df['Annual_Mileage']*df['Marital_Status']*df['Claims_History']*\
+                               df['Coverage_level']*df['Deductible']*df['Vehicle']
+    print(df['Calculated_premium'].mean())
+    return df
 
 
 if __name__ == '__main__':
