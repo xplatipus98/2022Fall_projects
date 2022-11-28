@@ -77,24 +77,24 @@ def create_df(number_of_customers):
     calculate_premium(fm_dataframe)
 
 
-def calculate_premium(dataframe, n):
+def calculate_premium(df):
     """
     This function returns the total insurance premium of n customers based on their relativity of each variable that
     we have considered
     :param df:
-    :param dataframe: dataframe with relativities of all the factors affecting insurance premium
+    :param dataframe: dataframe with relativity of all the factors affecting insurance premium
     :param n: No. of customers
     :return: total insurance premium
     """
     baseline_premium = 1600
-    df['Calculated_premium'] = baseline_premium*df['Age']*df['Driving_History_DUI']*df['Driving_History_reckless']*\
+    df['Relativity'] = df['Age']*df['Driving_History_DUI']*df['Driving_History_reckless']*\
                                df['Driving_History_speeding']*df['Credit_Score']*df['Years_of_Driving']*df['Location']*\
                                df['Insurance_History']*df['Annual_Mileage']*df['Marital_Status']*df['Claims_History']*\
                                df['Coverage_level']*df['Deductible']*df['Vehicle']
-    print(df['Calculated_premium'].mean())
-    return df
+    df['Calculated_premium'] = baseline_premium*df['Relativity']
+    print(df['Relativity'].head(20))
+    df.to_csv('initial_df.csv')
 
 
 if __name__ == '__main__':
-    df = create_df(1000)
-    print(df.describe())
+    create_df(1000)
