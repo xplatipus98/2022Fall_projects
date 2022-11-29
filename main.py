@@ -94,6 +94,7 @@ def get_credit_relativity(credit_dict):
         relativity = credit_dict["800-850"]
     return relativity
 
+
 def get_general_relativity(val_dict, variable):
     """
     Finds random relativity of varibales not associated with any distribution
@@ -102,6 +103,8 @@ def get_general_relativity(val_dict, variable):
     d = val_dict[variable]
     relativity = list(d.values())[np.random.randint(0, len(d))]
     return relativity
+
+
 def get_relativity(info_dict):
     """
 
@@ -109,26 +112,31 @@ def get_relativity(info_dict):
     :return: dictionary with relativity values
     """
     age_relativity = get_age_relativity(info_dict['age'])
-    driving_history_dui_relativity = get_general_relativity(info_dict,'driving_hist_dui')
-    driving_hist_reckless_relativity = get_general_relativity(info_dict,'driving_hist_reckless')
-    driving_hist_speeding_relativity = get_general_relativity(info_dict,'driving_hist_speeding')
+    driving_history_dui_relativity = get_general_relativity(info_dict, 'driving_hist_dui')
+    driving_hist_reckless_relativity = get_general_relativity(info_dict, 'driving_hist_reckless')
+    driving_hist_speeding_relativity = get_general_relativity(info_dict, 'driving_hist_speeding')
     credit_score_relativity = get_credit_relativity(info_dict['credit_score'])
-    driving_exp_relativity = get_general_relativity(info_dict,'driving_exp')
-    location_relativity = get_general_relativity(info_dict,'location')
-    insurance_hist_relativity = get_general_relativity(info_dict,'insurance_hist')
-    annual_mileage_relativity = get_general_relativity(info_dict,'annual_mileage')
-    marital_status_relativity = get_general_relativity(info_dict,'marital_status')
-    claims_hist_relativity = get_general_relativity(info_dict,'claims_hist')
-    coverage_level_relativity = get_general_relativity(info_dict,'coverage_level')
-    deductible_relativity = get_general_relativity(info_dict,'deductible')
-    vehicle_safety_relativity = get_general_relativity(info_dict,'vehicle_safety')
-    relativity_dict = {"Age": age_relativity, "Driving_History_DUI": driving_history_dui_relativity, "Driving_History_reckless": driving_hist_reckless_relativity,
-             "Driving_History_speeding": driving_hist_speeding_relativity, "Credit_Score": credit_score_relativity,
-             "Years_of_Driving": driving_exp_relativity, "Location": location_relativity, "Insurance_History": insurance_hist_relativity,
-             "Annual_Mileage": annual_mileage_relativity, "Marital_Status": marital_status_relativity,
-             "Claims_History": claims_hist_relativity, "Coverage_level": coverage_level_relativity, "Deductible": deductible_relativity,
-             "Vehicle": vehicle_safety_relativity}
+    driving_exp_relativity = get_general_relativity(info_dict, 'driving_exp')
+    location_relativity = get_general_relativity(info_dict, 'location')
+    insurance_hist_relativity = get_general_relativity(info_dict, 'insurance_hist')
+    annual_mileage_relativity = get_general_relativity(info_dict, 'annual_mileage')
+    marital_status_relativity = get_general_relativity(info_dict, 'marital_status')
+    claims_hist_relativity = get_general_relativity(info_dict, 'claims_hist')
+    coverage_level_relativity = get_general_relativity(info_dict, 'coverage_level')
+    deductible_relativity = get_general_relativity(info_dict, 'deductible')
+    vehicle_safety_relativity = get_general_relativity(info_dict, 'vehicle_safety')
+    relativity_dict = {"Age": age_relativity, "Driving_History_DUI": driving_history_dui_relativity,
+                       "Driving_History_reckless": driving_hist_reckless_relativity,
+                       "Driving_History_speeding": driving_hist_speeding_relativity,
+                       "Credit_Score": credit_score_relativity,
+                       "Years_of_Driving": driving_exp_relativity, "Location": location_relativity,
+                       "Insurance_History": insurance_hist_relativity,
+                       "Annual_Mileage": annual_mileage_relativity, "Marital_Status": marital_status_relativity,
+                       "Claims_History": claims_hist_relativity, "Coverage_level": coverage_level_relativity,
+                       "Deductible": deductible_relativity,
+                       "Vehicle": vehicle_safety_relativity}
     return relativity_dict
+
 
 def create_df(number_of_customers):
     """
@@ -156,23 +164,23 @@ def create_df(number_of_customers):
     calculate_premium(fm_dataframe)
 
 
-def cal_relativity(data):
+def cal_relativity(number_of_customers):
     """
     Finds final relativity of each customer and the total premium of all the customers
-    :param data: list of dictionaries with randomized values of relativity for each variable
+    :param number_of_customers:
     :return: list with aggregate relativity for each customer
     """
     relativities = []
-    premium_per_customer = []
     base_premium = 1600  # assumption
     total_premium = 0
+    info_dict = dict_generator()
 
-    for customer in data:
+    for i in range(0, number_of_customers):
         relativity_per_customer = 1
-        for columns, relativity in customer.items():
+        data_dict = get_relativity(info_dict)
+        for columns, relativity in data_dict.items():
             relativity_per_customer = relativity_per_customer * relativity
         relativities.append(relativity_per_customer)
-        premium_per_customer.append(base_premium * relativity_per_customer)
         total_premium = total_premium + (base_premium * relativity_per_customer)
 
     return relativities, total_premium
@@ -198,5 +206,6 @@ def calculate_premium(df):
 
 
 if __name__ == '__main__':
-    #create_df(10)
+    # create_df(10)
     dict_generator()
+    print(cal_relativity(1000))
