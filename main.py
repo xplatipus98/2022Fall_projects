@@ -8,12 +8,19 @@ SPARSH SADAFAL
 
 import pandas as pd
 import numpy as np
+from scipy.stats import truncnorm
 import matplotlib.pyplot as plt
 from random import randint
 import warnings
 
 warnings.filterwarnings("ignore")
 
+def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
+    """Returns randomly generated value from normal distribution with a set maximum and minimum value
+    :return: Random floating point number
+    """
+    return truncnorm(
+        (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 def dict_generator():
     """
@@ -32,7 +39,7 @@ def dict_generator():
                    "6-15 years": 1, "15+ years": 0.97}
     location = {"Urban": 1.05, "Rural": 0.97, "Suburban": 1}
     insurance_hist = {"No coverage": 1.2, "Coverage (past 6 months)": 1.05,
-                      "Coverage (past 1 year)": 1.05, "Coverage (past 6 months)": 1.05}
+                      "Coverage (past 1 year)": 1.05}
     annual_mileage = {"0-7500 miles": 1, "7500-10000 miles": 1.1,
                       "10001-15000 miles": 1.15, "15000+ miles": 1.2}
     marital_status = {"Married": 0.95, "Single/Divorced/Widowed": 1}
@@ -51,7 +58,34 @@ def dict_generator():
                             )
     return information_list
 
+def get_age_relativity(age_dict):
+    relativity = 1
+    random_age = int(get_truncated_normal(mean=40, sd=20, low=300, upp=850).rvs())
+    if 18 <= random_age < 25:
+        relativity = age_dict["18-24 years"]
+    elif 25 <= random_age <= 45:
+        relativity = age_dict["25-45 years"]
+    elif 45 < random_age <= 60:
+        relativity = age_dict["45-60 years"]
+    elif 60 < random_age:
+        relativity = age_dict["60+ years"]
+    return relativity
 
+def get_credit_relativity(credit_dict):
+    relativity = 1
+    random_credit = int(get_truncated_normal(mean=700, sd=100, low=350, upp=850).rvs())
+    if 300 <= random_credit < 580:
+        relativity = credit_dict["300-579"]
+    elif 580 <= random_credit < 670 :
+        relativity = credit_dict["580-669"]
+    elif 670 <= random_credit < 740:
+        relativity = credit_dict["670-739"]
+    elif 740 <= random_credit < 800:
+        relativity = credit_dict["740-799"]
+    elif 800 <= random_credit:
+        relativity = credit_dict["800-850"]
+    return relativity
+def get
 def create_df(number_of_customers):
     """
     Creates a dataframe with values of all the variables being considered for the auto insurance financial model
@@ -74,6 +108,7 @@ def create_df(number_of_customers):
              "Annual_Mileage": data[8], "Marital_Status": data[9],
              "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
              "Vehicle": data[13]}, ignore_index=True)
+    #print(fm_dataframe.head())
     calculate_premium(fm_dataframe)
 
 
@@ -119,4 +154,4 @@ def calculate_premium(df):
 
 
 if __name__ == '__main__':
-    create_df(1000)
+    create_df(10)
