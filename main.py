@@ -60,6 +60,8 @@ def dict_generator():
                         'insurance_hist': insurance_hist, 'annual_mileage': annual_mileage,
                         'marital_status': marital_status, 'claims_hist': claims_hist, 'coverage_level': coverage_level,
                         'deductible': deductible, 'vehicle_safety': vehicle_safety}
+    print(information_dict)
+    print(get_relativity(information_dict))
     return information_dict
 
 
@@ -196,4 +198,5 @@ def calculate_premium(df):
 
 
 if __name__ == '__main__':
-    create_df(10)
+    #create_df(10)
+    dict_generator()
