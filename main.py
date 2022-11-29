@@ -5,11 +5,11 @@ ANTARA CHANSARKAR
 SAKET NAIK
 SPARSH SADAFAL
 """
+import copy
 
 import pandas as pd
 import numpy as np
 from scipy.stats import truncnorm
-import copy
 import matplotlib.pyplot as plt
 from random import randint
 import warnings
@@ -88,7 +88,6 @@ def get_age_relativity(age_dict, agg_age_dict):
         agg_age_dict["45-60 years"] += 1
     elif 60 < random_age:
         relativity = age_dict["60+ years"]
-        agg_age_dict["60+ years"] += 1
     return relativity
 
 
@@ -128,7 +127,7 @@ def get_general_relativity(val_dict, agg_dict, variable):
     return relativity
 
 
-def get_relativity(info_dict,agg_dict):
+def get_relativity(info_dict, agg_dict):
     """
 
     :param agg_dict:
@@ -136,19 +135,19 @@ def get_relativity(info_dict,agg_dict):
     :return: dictionary with relativity values
     """
     age_relativity = get_age_relativity(info_dict['age'],agg_dict['age'])
-    driving_history_dui_relativity = get_general_relativity(info_dict,agg_dict, 'driving_hist_dui')
-    driving_hist_reckless_relativity = get_general_relativity(info_dict,agg_dict, 'driving_hist_reckless')
-    driving_hist_speeding_relativity = get_general_relativity(info_dict,agg_dict, 'driving_hist_speeding')
+    driving_history_dui_relativity = get_general_relativity(info_dict, agg_dict, 'driving_hist_dui')
+    driving_hist_reckless_relativity = get_general_relativity(info_dict, agg_dict, 'driving_hist_reckless')
+    driving_hist_speeding_relativity = get_general_relativity(info_dict, agg_dict, 'driving_hist_speeding')
     credit_score_relativity = get_credit_relativity(info_dict['credit_score'], agg_dict['credit_score'])
-    driving_exp_relativity = get_general_relativity(info_dict,agg_dict, 'driving_exp')
-    location_relativity = get_general_relativity(info_dict,agg_dict, 'location')
-    insurance_hist_relativity = get_general_relativity(info_dict,agg_dict, 'insurance_hist')
-    annual_mileage_relativity = get_general_relativity(info_dict,agg_dict, 'annual_mileage')
-    marital_status_relativity = get_general_relativity(info_dict,agg_dict, 'marital_status')
+    driving_exp_relativity = get_general_relativity(info_dict, agg_dict, 'driving_exp')
+    location_relativity = get_general_relativity(info_dict, agg_dict, 'location')
+    insurance_hist_relativity = get_general_relativity(info_dict, agg_dict, 'insurance_hist')
+    annual_mileage_relativity = get_general_relativity(info_dict, agg_dict, 'annual_mileage')
+    marital_status_relativity = get_general_relativity(info_dict, agg_dict, 'marital_status')
     claims_hist_relativity = get_general_relativity(info_dict,agg_dict, 'claims_hist')
-    coverage_level_relativity = get_general_relativity(info_dict,agg_dict, 'coverage_level')
-    deductible_relativity = get_general_relativity(info_dict,agg_dict, 'deductible')
-    vehicle_safety_relativity = get_general_relativity(info_dict,agg_dict, 'vehicle_safety')
+    coverage_level_relativity = get_general_relativity(info_dict, agg_dict, 'coverage_level')
+    deductible_relativity = get_general_relativity(info_dict, agg_dict, 'deductible')
+    vehicle_safety_relativity = get_general_relativity(info_dict, agg_dict, 'vehicle_safety')
     relativity_dict = {"Age": age_relativity, "Driving_History_DUI": driving_history_dui_relativity,
                        "Driving_History_reckless": driving_hist_reckless_relativity,
                        "Driving_History_speeding": driving_hist_speeding_relativity,
@@ -197,20 +196,33 @@ def cal_relativity(number_of_customers):
     relativities = []
     base_premium = 1600  # assumption
     total_premium = 0
-    info_dict, agg_dict = dict_generator()
+    info_dict, agg_list = dict_generator()
 
     for i in range(0, number_of_customers):
         relativity_per_customer = 1
-        data_dict = get_relativity(info_dict,agg_dict)
+        data_dict = get_relativity(info_dict, agg_list)
         for columns, relativity in data_dict.items():
             relativity_per_customer = relativity_per_customer * relativity
         relativities.append(relativity_per_customer)
         total_premium = total_premium + (base_premium * relativity_per_customer)
-    print(total_premium)
-    print(agg_dict)
+    print(relativities)
+    print("Total premium: {}".format(total_premium))
     return relativities, total_premium
 
 
+def create_dist(no_cust):
+    """
+    This function fits the relativity distribution into a Poisson distribution and Gamma distribution
+    :return:
+    """
+    rel, mean_rel = cal_relativity(no_cust)
+    poisson_dist = np.random.poisson(mean_rel, len(rel))
+    gamma_dist = np.random.gamma(mean_rel, len(rel))
+    plt.hist(poisson_dist, 14, density=True)
+    plt.show()
+
+
+## UNUSED FUNCTION
 def calculate_premium(df):
     """
     This function returns the total insurance premium of n customers based on their relativity of each variable that
@@ -227,10 +239,11 @@ def calculate_premium(df):
                        df['Coverage_level'] * df['Deductible'] * df['Vehicle']
     df['Calculated_premium'] = baseline_premium * df['Relativity']
     print(df['Relativity'].head(20))
-    df.to_csv('initial_df.csv')
+    # df.to_csv('initial_df.csv')
 
 
 if __name__ == '__main__':
-    # create_df(10)
-    #dict_generator()
-    cal_relativity(10000)
+    cal_relativity(5000)
+    # create_dist(5000)
+
+
