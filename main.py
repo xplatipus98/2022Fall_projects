@@ -52,11 +52,13 @@ def dict_generator():
     deductible = {"No deductible": 1.2, "$250": 1, "$500": 0.9, "$1000": 0.8}
     vehicle_safety = {"0 NCAP": 1.15, "1 NCAP": 1.1, "2 NCAP": 1.05, "3 NCAP": 1,
                       "4 NCAP": 0.95, "5 NCAP": 0.9}
-    information_list = list([age, driving_hist_dui, driving_hist_reckless, driving_hist_speeding, credit_score,
-                             driving_exp, location, insurance_hist, annual_mileage, marital_status, claims_hist,
-                             coverage_level, deductible, vehicle_safety]
-                            )
-    return information_list
+    information_dict = {'age': age, 'driving_hist_dui': driving_hist_dui,
+                        'driving_hist_reckless': driving_hist_reckless, 'driving_hist_speeding': driving_hist_speeding,
+                        'credit_score': credit_score, 'driving_exp': driving_exp, 'location': location,
+                        'insurance_hist': insurance_hist, 'annual_mileage': annual_mileage,
+                        'marital_status': marital_status, 'claims_hist': claims_hist, 'coverage_level': coverage_level,
+                        'deductible': deductible, 'vehicle_safety': vehicle_safety}
+    return information_dict
 
 def get_age_relativity(age_dict):
     relativity = 1
@@ -85,7 +87,6 @@ def get_credit_relativity(credit_dict):
     elif 800 <= random_credit:
         relativity = credit_dict["800-850"]
     return relativity
-def get
 def create_df(number_of_customers):
     """
     Creates a dataframe with values of all the variables being considered for the auto insurance financial model
