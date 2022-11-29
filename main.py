@@ -15,12 +15,14 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+
 def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
     """Returns randomly generated value from normal distribution with a set maximum and minimum value
     :return: Random floating point number
     """
     return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
+
 
 def dict_generator():
     """
@@ -60,6 +62,7 @@ def dict_generator():
                         'deductible': deductible, 'vehicle_safety': vehicle_safety}
     return information_dict
 
+
 def get_age_relativity(age_dict):
     relativity = 1
     random_age = int(get_truncated_normal(mean=40, sd=20, low=300, upp=850).rvs())
@@ -73,12 +76,13 @@ def get_age_relativity(age_dict):
         relativity = age_dict["60+ years"]
     return relativity
 
+
 def get_credit_relativity(credit_dict):
     relativity = 1
     random_credit = int(get_truncated_normal(mean=700, sd=100, low=350, upp=850).rvs())
     if 300 <= random_credit < 580:
         relativity = credit_dict["300-579"]
-    elif 580 <= random_credit < 670 :
+    elif 580 <= random_credit < 670:
         relativity = credit_dict["580-669"]
     elif 670 <= random_credit < 740:
         relativity = credit_dict["670-739"]
@@ -87,6 +91,43 @@ def get_credit_relativity(credit_dict):
     elif 800 <= random_credit:
         relativity = credit_dict["800-850"]
     return relativity
+
+def get_general_relativity(val_dict, variable):
+    """
+    Finds random relativity of varibales not associated with any distribution
+    :return: relativity
+    """
+    d = val_dict[variable]
+    relativity = list(d.values())[np.random.randint(0, len(d))]
+    return relativity
+def get_relativity(info_dict):
+    """
+
+    :param info_dict:
+    :return: dictionary with relativity values
+    """
+    age_relativity = get_age_relativity(info_dict['age'])
+    driving_history_dui_relativity = get_general_relativity(info_dict,'driving_hist_dui')
+    driving_hist_reckless_relativity = get_general_relativity(info_dict,'driving_hist_reckless')
+    driving_hist_speeding_relativity = get_general_relativity(info_dict,'driving_hist_speeding')
+    credit_score_relativity = get_credit_relativity(info_dict['credit_score'])
+    driving_exp_relativity = get_general_relativity(info_dict,'driving_exp')
+    location_relativity = get_general_relativity(info_dict,'location')
+    insurance_hist_relativity = get_general_relativity(info_dict,'insurance_hist')
+    annual_mileage_relativity = get_general_relativity(info_dict,'annual_mileage')
+    marital_status_relativity = get_general_relativity(info_dict,'marital_status')
+    claims_hist_relativity = get_general_relativity(info_dict,'claims_hist')
+    coverage_level_relativity = get_general_relativity(info_dict,'coverage_level')
+    deductible_relativity = get_general_relativity(info_dict,'deductible')
+    vehicle_safety_relativity = get_general_relativity(info_dict,'vehicle_safety')
+    relativity_dict = {"Age": age_relativity, "Driving_History_DUI": driving_history_dui_relativity, "Driving_History_reckless": driving_hist_reckless_relativity,
+             "Driving_History_speeding": driving_hist_speeding_relativity, "Credit_Score": credit_score_relativity,
+             "Years_of_Driving": driving_exp_relativity, "Location": location_relativity, "Insurance_History": insurance_hist_relativity,
+             "Annual_Mileage": annual_mileage_relativity, "Marital_Status": marital_status_relativity,
+             "Claims_History": claims_hist_relativity, "Coverage_level": coverage_level_relativity, "Deductible": deductible_relativity,
+             "Vehicle": vehicle_safety_relativity}
+    return relativity_dict
+
 def create_df(number_of_customers):
     """
     Creates a dataframe with values of all the variables being considered for the auto insurance financial model
@@ -109,7 +150,7 @@ def create_df(number_of_customers):
              "Annual_Mileage": data[8], "Marital_Status": data[9],
              "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
              "Vehicle": data[13]}, ignore_index=True)
-    #print(fm_dataframe.head())
+    # print(fm_dataframe.head())
     calculate_premium(fm_dataframe)
 
 
@@ -145,11 +186,11 @@ def calculate_premium(df):
     :return: total insurance premium
     """
     baseline_premium = 1600
-    df['Relativity'] = df['Age']*df['Driving_History_DUI']*df['Driving_History_reckless']*\
-                               df['Driving_History_speeding']*df['Credit_Score']*df['Years_of_Driving']*df['Location']*\
-                               df['Insurance_History']*df['Annual_Mileage']*df['Marital_Status']*df['Claims_History']*\
-                               df['Coverage_level']*df['Deductible']*df['Vehicle']
-    df['Calculated_premium'] = baseline_premium*df['Relativity']
+    df['Relativity'] = df['Age'] * df['Driving_History_DUI'] * df['Driving_History_reckless'] * \
+                       df['Driving_History_speeding'] * df['Credit_Score'] * df['Years_of_Driving'] * df['Location'] * \
+                       df['Insurance_History'] * df['Annual_Mileage'] * df['Marital_Status'] * df['Claims_History'] * \
+                       df['Coverage_level'] * df['Deductible'] * df['Vehicle']
+    df['Calculated_premium'] = baseline_premium * df['Relativity']
     print(df['Relativity'].head(20))
     df.to_csv('initial_df.csv')
 
