@@ -9,11 +9,11 @@ import copy
 
 import pandas as pd
 import numpy as np
+from scipy.stats.distributions import poisson
 from scipy.stats import truncnorm
-import matplotlib.pyplot as plt
-from random import randint
-import warnings
 
+import statistics
+import warnings
 warnings.filterwarnings("ignore")
 
 
@@ -161,6 +161,7 @@ def get_relativity(info_dict, agg_dict):
     return relativity_dict
 
 
+## UNUNSED FUNCTION
 def create_df(number_of_customers):
     """
     Creates a dataframe with values of all the variables being considered for the auto insurance financial model
@@ -205,21 +206,21 @@ def cal_relativity(number_of_customers):
             relativity_per_customer = relativity_per_customer * relativity
         relativities.append(relativity_per_customer)
         total_premium = total_premium + (base_premium * relativity_per_customer)
-    print(relativities)
-    print("Total premium: {}".format(total_premium))
+    # print(relativities)
+    # print("Total premium: {}".format(total_premium))
     return relativities, total_premium
 
 
-def create_dist(no_cust):
+def find_prob_of_claim(no_cust):
     """
-    This function fits the relativity distribution into a Poisson distribution and Gamma distribution
-    :return:
+    This function finds probability of claim via poisson dist and severity of claim via
+    :return: probability of claim for each customer
     """
-    rel, mean_rel = cal_relativity(no_cust)
-    poisson_dist = np.random.poisson(mean_rel, len(rel))
-    gamma_dist = np.random.gamma(mean_rel, len(rel))
-    plt.hist(poisson_dist, 14, density=True)
-    plt.show()
+    rel, total_premium = cal_relativity(no_cust)
+    freq_prob = poisson.pmf(rel, statistics.mean(rel))
+    print(freq_prob)
+
+    get_truncated_normal()
 
 
 ## UNUSED FUNCTION
@@ -239,11 +240,10 @@ def calculate_premium(df):
                        df['Coverage_level'] * df['Deductible'] * df['Vehicle']
     df['Calculated_premium'] = baseline_premium * df['Relativity']
     print(df['Relativity'].head(20))
-    # df.to_csv('initial_df.csv')
 
 
 if __name__ == '__main__':
-    cal_relativity(5000)
-    # create_dist(5000)
+    # cal_relativity(5000)
+    find_prob_of_claim(1)
 
 
