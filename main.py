@@ -77,6 +77,28 @@ def create_df(number_of_customers):
     calculate_premium(fm_dataframe)
 
 
+def cal_relativity(data):
+    """
+    Finds final relativity of each customer and the total premium of all the customers
+    :param data: list of dictionaries with randomized values of relativity for each variable
+    :return: list with aggregate relativity for each customer
+    """
+    relativities = []
+    premium_per_customer = []
+    base_premium = 1600  # assumption
+    total_premium = 0
+
+    for customer in data:
+        relativity_per_customer = 1
+        for columns, relativity in customer.items():
+            relativity_per_customer = relativity_per_customer * relativity
+        relativities.append(relativity_per_customer)
+        premium_per_customer.append(base_premium * relativity_per_customer)
+        total_premium = total_premium + (base_premium * relativity_per_customer)
+
+    return relativities, total_premium
+
+
 def calculate_premium(dataframe, n):
     """
     This function returns the total insurance premium of n customers based on their relativity of each variable that
@@ -87,10 +109,13 @@ def calculate_premium(dataframe, n):
     :return: total insurance premium
     """
     baseline_premium = 1600
-    df['Calculated_premium'] = baseline_premium*df['Age']*df['Driving_History_DUI']*df['Driving_History_reckless']*\
-                               df['Driving_History_speeding']*df['Credit_Score']*df['Years_of_Driving']*df['Location']*\
-                               df['Insurance_History']*df['Annual_Mileage']*df['Marital_Status']*df['Claims_History']*\
-                               df['Coverage_level']*df['Deductible']*df['Vehicle']
+    df['Calculated_premium'] = baseline_premium * df['Age'] * df['Driving_History_DUI'] * df[
+        'Driving_History_reckless'] * \
+                               df['Driving_History_speeding'] * df['Credit_Score'] * df['Years_of_Driving'] * df[
+                                   'Location'] * \
+                               df['Insurance_History'] * df['Annual_Mileage'] * df['Marital_Status'] * df[
+                                   'Claims_History'] * \
+                               df['Coverage_level'] * df['Deductible'] * df['Vehicle']
     print(df['Calculated_premium'].mean())
     return df
 
