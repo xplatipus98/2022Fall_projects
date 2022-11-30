@@ -13,10 +13,6 @@ from scipy.stats.distributions import poisson
 from scipy.stats import truncnorm
 
 import statistics
-import matplotlib.pyplot as plt
-import statistics
-
-from random import randint
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -165,7 +161,7 @@ def get_relativity(info_dict, agg_dict):
     return relativity_dict
 
 
-## UNUNSED FUNCTION
+# UNUNSED FUNCTION
 def create_df(number_of_customers):
     """
     Creates a dataframe with values of all the variables being considered for the auto insurance financial model
@@ -226,8 +222,31 @@ def find_prob_of_claim(no_cust):
     rel, total_premium, coverage = cal_relativity(no_cust)
     freq_prob = poisson.pmf(rel, statistics.mean(rel))
     print(freq_prob)
-
-    get_truncated_normal()
+    rel, total_premium = cal_relativity(no_cust)
+    # bin the relativity scores
+    rel_int = []
+    for value in rel:
+        if value > 5:
+            rel_int.append(10)
+        elif value > 4:
+            rel_int.append(9)
+        elif value > 3.5:
+            rel_int.append(8)
+        elif value > 3:
+            rel_int.append(7)
+        elif value > 2.5:
+            rel_int.append(6)
+        elif value > 2:
+            rel_int.append(5)
+        elif value > 1.5:
+            rel_int.append(4)
+        elif value > 1.4:
+            rel_int.append(3)
+        elif value > 1.2:
+            rel_int.append(2)
+        else:
+            rel_int.append(1)
+    freq_prob = poisson.pmf(rel_int, statistics.mean(rel))
 
 
 def find_SD():
@@ -237,7 +256,7 @@ def find_SD():
     """
     info_dict, agg_list = dict_generator()
     sd_dict = {}
-    for key,value in info_dict.items():
+    for key, value in info_dict.items():
         sd_dict[key] = statistics.stdev(list(value.values()))
     return sd_dict
 
@@ -254,7 +273,7 @@ def find_SD():
     # for v in range(len(rel_dict)):"""
 
 
-## UNUSED FUNCTION
+# UNUSED FUNCTION
 def calculate_premium(df):
     """
     This function returns the total insurance premium of n customers based on their relativity of each variable that
@@ -274,12 +293,7 @@ def calculate_premium(df):
 
 
 if __name__ == '__main__':
-    print(cal_relativity(100))
-    # find_prob_of_claim(1)
     # cal_relativity(5000)
-    find_prob_of_claim(10)
+    find_prob_of_claim(1000)
 
-    # dict_generator()
-    # cal_relativity(10000)
-    # create_dist(5000)
-    # print(find_SD())
+
