@@ -13,6 +13,10 @@ from scipy.stats.distributions import poisson
 from scipy.stats import truncnorm
 
 import statistics
+import matplotlib.pyplot as plt
+import statistics
+
+from random import randint
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -134,7 +138,7 @@ def get_relativity(info_dict, agg_dict):
     :param info_dict:
     :return: dictionary with relativity values
     """
-    age_relativity = get_age_relativity(info_dict['age'],agg_dict['age'])
+    age_relativity = get_age_relativity(info_dict['age'], agg_dict['age'])
     driving_history_dui_relativity = get_general_relativity(info_dict, agg_dict, 'driving_hist_dui')
     driving_hist_reckless_relativity = get_general_relativity(info_dict, agg_dict, 'driving_hist_reckless')
     driving_hist_speeding_relativity = get_general_relativity(info_dict, agg_dict, 'driving_hist_speeding')
@@ -144,7 +148,7 @@ def get_relativity(info_dict, agg_dict):
     insurance_hist_relativity = get_general_relativity(info_dict, agg_dict, 'insurance_hist')
     annual_mileage_relativity = get_general_relativity(info_dict, agg_dict, 'annual_mileage')
     marital_status_relativity = get_general_relativity(info_dict, agg_dict, 'marital_status')
-    claims_hist_relativity = get_general_relativity(info_dict,agg_dict, 'claims_hist')
+    claims_hist_relativity = get_general_relativity(info_dict, agg_dict, 'claims_hist')
     coverage_level_relativity = get_general_relativity(info_dict, agg_dict, 'coverage_level')
     deductible_relativity = get_general_relativity(info_dict, agg_dict, 'deductible')
     vehicle_safety_relativity = get_general_relativity(info_dict, agg_dict, 'vehicle_safety')
@@ -223,6 +227,31 @@ def find_prob_of_claim(no_cust):
     get_truncated_normal()
 
 
+def find_SD():
+    """
+    calculated standard deviation of each bucket
+    :return: a list with standard deviations of each bucket
+    """
+    info_dict, agg_list = dict_generator()
+    SD = []
+    for j in info_dict.values():
+        stan_d = statistics.stdev(list(j.values()))
+        SD.append(stan_d)
+    return SD
+
+
+"""def optimize_profit():
+    
+
+    :return:
+    
+    n = 1
+    info_dict, agg_dict = dict_generator()
+    rel_dict = get_relativity(info_dict, agg_dict)
+    sd = find_SD()
+    # for v in range(len(rel_dict)):"""
+
+
 ## UNUSED FUNCTION
 def calculate_premium(df):
     """
@@ -247,3 +276,7 @@ if __name__ == '__main__':
     find_prob_of_claim(1)
 
 
+    dict_generator()
+    # cal_relativity(10000)
+    # create_dist(5000)
+    print(find_SD())
