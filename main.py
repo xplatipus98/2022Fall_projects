@@ -6,6 +6,7 @@ SAKET NAIK
 SPARSH SADAFAL
 """
 import copy
+import random
 from typing import List
 
 import pandas as pd
@@ -49,10 +50,10 @@ def dict_generator():
     marital_status = {"Married": 0.95, "Single/Divorced/Widowed": 1}
     claims_hist = {"Filed within last 1 year": 1.25, "Filed within last 1-3 years": 1.15,
                    "No claims filed": 1}
-    coverage_level = {"10-20k": 0.94, "20k-30k": 0.97, "30k-40k": 1, "40k-50k": 1.05,
-                      "50-60k": 1.09, "60k-70k": 1.12, "70k-80k": 1.15, "80k-90k": 1.18,
-                      "90k-100k": 1.22, "100k-110k": 1.25, "110-120k": 1.28, "120k-130k": 1.32,
-                      "130k-140k": 1.35, "140k-150k": 1.38}
+    coverage_level = {"10000-20000": 0.94, "20000-30000": 0.97, "30000-40000": 1, "40000-50000": 1.05,
+                      "50000-60000": 1.09, "60000-70000": 1.12, "70000-80000": 1.15, "80000-90000": 1.18,
+                      "90000-100000": 1.22, "100000-110000": 1.25, "110000-120000": 1.28, "120000-130000": 1.32,
+                      "130000-140000": 1.35, "140000-150000": 1.38}
     deductible = {"No deductible": 1.2, "$250": 1, "$500": 0.9, "$1000": 0.8}
     vehicle_safety = {"0 NCAP": 1.15, "1 NCAP": 1.1, "2 NCAP": 1.05, "3 NCAP": 1,
                       "4 NCAP": 0.95, "5 NCAP": 0.9}
@@ -185,24 +186,40 @@ def cal_relativity(number_of_customers):
         total_premium = total_premium + (base_premium * relativity_per_customer)
     # print(relativities)
     # print("Total premium: {}".format(total_premium))
-    return relativities, total_premium, coverage_levels
+    return relativities, round(total_premium, 3), coverage_levels
 
 
-def find_prob_of_claim(no_cust):
+def find_total_claim_amt(no_cust):
     """
     This function finds probability of claim via poisson dist and severity of claim via
     :return: probability of claim for each customer
     """
-    rel, total_premium, coverages = cal_relativity(no_cust)
+    rel, total_premium, coverages_rel = cal_relativity(no_cust)
     # bin the relativity scores as poisson pmf function cannot directly fit floating point values of relativity
     relativity_int = bin_relativity(rel)
     freq_prob = poisson.pmf(relativity_int, statistics.mean(rel))
-    for coverage in coverages:
-        # check where coverage relativity lies and just pass the max value of coverage in that bin - HARD CODED APPROACH - need better approach
-        pass
+    claim_sev = []
+    for coverage_rel in coverages_rel:
+        coverage_val = find_claim_severity(coverage_rel)
+        claim_sev.append(coverage_val)
+    print("Frequency Probabilities: {}".format(freq_prob))
+    print("Claim severity: {}".format(claim_sev))
+    total_claim_amount = sum([x * y for x, y in zip(freq_prob, claim_sev)])
+    return round(total_claim_amount, 3)
 
-    claim_value = freq_prob*coverage
-    print(claim_value)
+
+def find_claim_severity(coverage_relativity):
+    """
+    This function finds the claim severity by fitting the relativity into a normal distribution
+    :return: Returns a number which is the claim severity
+    """
+    coverage_bucket_dict = dict_generator()[0]['coverage_level']
+    for claim_severity_level, coverage_bucket in coverage_bucket_dict.items():
+        if coverage_relativity == coverage_bucket:
+            claim_level = claim_severity_level.split("-")
+            claim_level = [int(i) for i in claim_level]
+            claim_val = np.random.normal(statistics.mean(claim_level), statistics.stdev(claim_level))
+    return round(claim_val, 2)
 
 
 def bin_relativity(rel_list):
@@ -247,16 +264,23 @@ def find_SD():
     return sd_dict
 
 
-"""def optimize_profit():
-    
+def optimize_profit(no_of_cust):
+    """
+
     :return:
-    
+    """
     n = 1
     info_dict, agg_dict = dict_generator()
     rel_dict = get_relativity(info_dict, agg_dict)
     sd = find_SD()
     # for v in range(len(rel_dict)):"""
-"""
+
+    total_revenue_from_premium = cal_relativity(no_of_cust)[1]
+    print("Total revenue earned from insurance premium: {}".format(total_revenue_from_premium))
+    total_claim_val = find_total_claim_amt(no_of_cust)
+    print("Total value of claims: {}".format(total_claim_val))
+    pl_from_premium = round(total_revenue_from_premium - total_claim_val, 3)
+    print("Company PL: {}".format(pl_from_premium))
 
 
 # UNUSED FUNCTIONS BLOCK
@@ -292,10 +316,12 @@ def create_df(number_of_customers):
              "Vehicle": data[13]}, ignore_index=True)
     # print(fm_dataframe.head())
     calculate_premium(fm_dataframe)
-"""
+
 
 if __name__ == '__main__':
     # cal_relativity(5000)
-    find_prob_of_claim(1000)
+    optimize_profit(500)
+    # find_claim_severity(1)
+
 
 
