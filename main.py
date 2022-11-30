@@ -199,6 +199,7 @@ def cal_relativity(number_of_customers):
     :return: list with aggregate relativity for each customer
     """
     relativities = []
+    coverage_levels = []
     base_premium = 1600  # assumption
     total_premium = 0
     info_dict, agg_list = dict_generator()
@@ -206,13 +207,15 @@ def cal_relativity(number_of_customers):
     for i in range(0, number_of_customers):
         relativity_per_customer = 1
         data_dict = get_relativity(info_dict, agg_list)
-        for columns, relativity in data_dict.items():
+        for column, relativity in data_dict.items():
             relativity_per_customer = relativity_per_customer * relativity
+            if column == 'Coverage_level':
+                coverage_levels.append(relativity)
         relativities.append(relativity_per_customer)
         total_premium = total_premium + (base_premium * relativity_per_customer)
     # print(relativities)
     # print("Total premium: {}".format(total_premium))
-    return relativities, total_premium
+    return relativities, total_premium, coverage_levels
 
 
 def find_prob_of_claim(no_cust):
@@ -220,7 +223,7 @@ def find_prob_of_claim(no_cust):
     This function finds probability of claim via poisson dist and severity of claim via
     :return: probability of claim for each customer
     """
-    rel, total_premium = cal_relativity(no_cust)
+    rel, total_premium, coverage = cal_relativity(no_cust)
     freq_prob = poisson.pmf(rel, statistics.mean(rel))
     print(freq_prob)
 
@@ -271,11 +274,12 @@ def calculate_premium(df):
 
 
 if __name__ == '__main__':
+    print(cal_relativity(100))
+    # find_prob_of_claim(1)
     # cal_relativity(5000)
     find_prob_of_claim(10)
 
-
-    dict_generator()
+    # dict_generator()
     # cal_relativity(10000)
     # create_dist(5000)
-    print(find_SD())
+    # print(find_SD())
