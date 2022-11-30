@@ -233,11 +233,10 @@ def find_SD():
     :return: a list with standard deviations of each bucket
     """
     info_dict, agg_list = dict_generator()
-    SD = []
-    for j in info_dict.values():
-        stan_d = statistics.stdev(list(j.values()))
-        SD.append(stan_d)
-    return SD
+    sd_dict = {}
+    for key,value in info_dict.items():
+        sd_dict[key] = statistics.stdev(list(value.values()))
+    return sd_dict
 
 
 """def optimize_profit():
@@ -273,7 +272,7 @@ def calculate_premium(df):
 
 if __name__ == '__main__':
     # cal_relativity(5000)
-    find_prob_of_claim(1)
+    find_prob_of_claim(10)
 
 
     dict_generator()
