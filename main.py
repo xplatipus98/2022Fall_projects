@@ -6,6 +6,7 @@ SAKET NAIK
 SPARSH SADAFAL
 """
 import copy
+from typing import List
 
 import pandas as pd
 import numpy as np
@@ -161,33 +162,6 @@ def get_relativity(info_dict, agg_dict):
     return relativity_dict
 
 
-# UNUNSED FUNCTION
-def create_df(number_of_customers):
-    """
-    Creates a dataframe with values of all the variables being considered for the auto insurance financial model
-    :return: dataframe with relativity of all the variables
-    """
-    column_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless', 'Driving_History_speeding' 'Credit_Score',
-                    'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
-                    'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
-    fm_dataframe = pd.DataFrame(columns=column_names)
-    for i in range(0, number_of_customers):
-        data = []
-        for info_dict in dict_generator():
-            x = np.random.randint(0, len(info_dict))
-            value = list(info_dict.values())[x]
-            data.append(value)
-        fm_dataframe = fm_dataframe.append(
-            {"Age": data[0], "Driving_History_DUI": data[1], "Driving_History_reckless": data[2],
-             "Driving_History_speeding": data[3], "Credit_Score": data[4],
-             "Years_of_Driving": data[5], "Location": data[6], "Insurance_History": data[7],
-             "Annual_Mileage": data[8], "Marital_Status": data[9],
-             "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
-             "Vehicle": data[13]}, ignore_index=True)
-    # print(fm_dataframe.head())
-    calculate_premium(fm_dataframe)
-
-
 def cal_relativity(number_of_customers):
     """
     Finds final relativity of each customer and the total premium of all the customers
@@ -219,13 +193,25 @@ def find_prob_of_claim(no_cust):
     This function finds probability of claim via poisson dist and severity of claim via
     :return: probability of claim for each customer
     """
-    rel, total_premium, coverage = cal_relativity(no_cust)
-    freq_prob = poisson.pmf(rel, statistics.mean(rel))
-    print(freq_prob)
-    rel, total_premium = cal_relativity(no_cust)
-    # bin the relativity scores
-    rel_int = []
-    for value in rel:
+    rel, total_premium, coverages = cal_relativity(no_cust)
+    # bin the relativity scores as poisson pmf function cannot directly fit floating point values of relativity
+    relativity_int = bin_relativity(rel)
+    freq_prob = poisson.pmf(relativity_int, statistics.mean(rel))
+    for coverage in coverages:
+        # check where coverage relativity lies and just pass the max value of coverage in that bin - HARD CODED APPROACH - need better approach
+        pass
+
+    claim_value = freq_prob*coverage
+    print(claim_value)
+
+
+def bin_relativity(rel_list):
+    """
+    This function bins the relativity values at different integer levels to be used for fitting to various distributions
+    :return: List of binned relativity values
+    """
+    rel_int: list[int] = []
+    for value in rel_list:
         if value > 5:
             rel_int.append(10)
         elif value > 4:
@@ -240,13 +226,13 @@ def find_prob_of_claim(no_cust):
             rel_int.append(5)
         elif value > 1.5:
             rel_int.append(4)
-        elif value > 1.4:
+        elif value > 1.35:
             rel_int.append(3)
         elif value > 1.2:
             rel_int.append(2)
         else:
             rel_int.append(1)
-    freq_prob = poisson.pmf(rel_int, statistics.mean(rel))
+    return rel_int
 
 
 def find_SD():
@@ -263,7 +249,6 @@ def find_SD():
 
 """def optimize_profit():
     
-
     :return:
     
     n = 1
@@ -271,18 +256,12 @@ def find_SD():
     rel_dict = get_relativity(info_dict, agg_dict)
     sd = find_SD()
     # for v in range(len(rel_dict)):"""
+"""
 
 
-# UNUSED FUNCTION
+# UNUSED FUNCTIONS BLOCK
 def calculate_premium(df):
-    """
-    This function returns the total insurance premium of n customers based on their relativity of each variable that
-    we have considered
-    :param df:
-    :param dataframe: dataframe with relativity of all the factors affecting insurance premium
-    :param n: No. of customers
-    :return: total insurance premium
-    """
+
     baseline_premium = 1600
     df['Relativity'] = df['Age'] * df['Driving_History_DUI'] * df['Driving_History_reckless'] * \
                        df['Driving_History_speeding'] * df['Credit_Score'] * df['Years_of_Driving'] * df['Location'] * \
@@ -291,6 +270,29 @@ def calculate_premium(df):
     df['Calculated_premium'] = baseline_premium * df['Relativity']
     print(df['Relativity'].head(20))
 
+
+def create_df(number_of_customers):
+
+    column_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless', 'Driving_History_speeding' 'Credit_Score',
+                    'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
+                    'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
+    fm_dataframe = pd.DataFrame(columns=column_names)
+    for i in range(0, number_of_customers):
+        data = []
+        for info_dict in dict_generator():
+            x = np.random.randint(0, len(info_dict))
+            value = list(info_dict.values())[x]
+            data.append(value)
+        fm_dataframe = fm_dataframe.append(
+            {"Age": data[0], "Driving_History_DUI": data[1], "Driving_History_reckless": data[2],
+             "Driving_History_speeding": data[3], "Credit_Score": data[4],
+             "Years_of_Driving": data[5], "Location": data[6], "Insurance_History": data[7],
+             "Annual_Mileage": data[8], "Marital_Status": data[9],
+             "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
+             "Vehicle": data[13]}, ignore_index=True)
+    # print(fm_dataframe.head())
+    calculate_premium(fm_dataframe)
+"""
 
 if __name__ == '__main__':
     # cal_relativity(5000)
