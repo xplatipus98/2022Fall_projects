@@ -50,10 +50,8 @@ def dict_generator() -> tuple[dict, dict]:
     marital_status = {"Married": 0.95, "Single/Divorced/Widowed": 1}
     claims_hist = {"Filed within last 1 year": 1.25, "Filed within last 1-3 years": 1.15,
                    "No claims filed": 1}
-    coverage_level = {"10000-20000": 0.7, "20000-30000": 0.8, "30000-40000": 1, "40000-50000": 1.15,
-                      "50000-60000": 1.3, "60000-70000": 1.45, "70000-80000": 1.6, "80000-90000": 1.75,
-                      "90000-100000": 1.9, "100000-110000": 2.05, "110000-120000": 2.2, "120000-130000": 2.35,
-                      "130000-140000": 2.5, "140000-150000": 2.7}
+    coverage_level = {"25000": 1, "50000": 1.2, "100000": 1.5, "200000": 1.6,
+                      "300000": 1.7}
     deductible = {"No deductible": 1.2, "$250": 1, "$500": 0.9, "$1000": 0.8}
     vehicle_safety = {"0 NCAP": 1.15, "1 NCAP": 1.1, "2 NCAP": 1.05, "3 NCAP": 1,
                       "4 NCAP": 0.95, "5 NCAP": 0.9}
@@ -233,9 +231,8 @@ def find_claim_severity(coverage_relativity: list) -> float:
     coverage_bucket_dict = dict_generator()[0]['coverage_level']
     for claim_severity_level, coverage_bucket in coverage_bucket_dict.items():
         if coverage_relativity == coverage_bucket:
-            claim_level = claim_severity_level.split("-")
-            claim_level = [int(i) for i in claim_level]
-            claim_val = np.random.normal(statistics.mean(claim_level), statistics.stdev(claim_level))
+            claim_level = int(claim_severity_level)
+            claim_val = np.random.normal(statistics.mean([0,claim_level]), statistics.stdev([0,claim_level]))
     return round(claim_val, 2)
 
 
@@ -300,6 +297,8 @@ def optimize_profit(no_of_cust: int):
     print("Total value of claims: {}".format(total_claim_val))
     pl_from_premium = round(total_revenue_from_premium - total_claim_val, 3)
     print("Company PL: {}".format(pl_from_premium))
+    loss_ratio = round(total_claim_val/total_revenue_from_premium,2)
+    print("Underwriting Loss Ratio: {}".format(loss_ratio))
 
 
 # UNUSED FUNCTIONS BLOCK
@@ -337,5 +336,5 @@ def create_df(number_of_customers):
 
 if __name__ == '__main__':
     # cal_relativity(5000)
-    optimize_profit(10)
+    optimize_profit(1000)
     # find_claim_severity(1)
