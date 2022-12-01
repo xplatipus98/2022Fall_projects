@@ -8,18 +8,18 @@ SPARSH SADAFAL
 import copy
 import random
 from typing import List
-
 import pandas as pd
 import numpy as np
 from scipy.stats.distributions import poisson
 from scipy.stats import truncnorm
-
 import statistics
+
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
-def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
+def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
     """Returns randomly generated value from normal distribution with a set maximum and minimum value
     :return: Random floating point number
     """
@@ -27,7 +27,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator():
+def dict_generator() -> tuple[dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -74,7 +74,13 @@ def dict_generator():
     return information_dict, aggregate_dict
 
 
-def get_age_relativity(age_dict, agg_age_dict):
+def get_age_relativity(age_dict: dict, agg_age_dict: dict) -> float:
+    """
+    This fucntion calculates the relativity value of age of customers by fitting to a truncated normal distribution
+    :param age_dict: dictionary of age value buckets
+    :param agg_age_dict: dictionary of aggregated age values
+    :return: relativity score
+    """
     # agg_age_dict = {"18-24 years": 0, "25-45 years": 0, "45-60 years": 0,
     #            "60+ years": 0}
     relativity = 1
@@ -93,7 +99,13 @@ def get_age_relativity(age_dict, agg_age_dict):
     return relativity
 
 
-def get_credit_relativity(credit_dict, agg_credit_dict):
+def get_credit_relativity(credit_dict: dict, agg_credit_dict: dict) -> float:
+    """
+    This fucntion calculates the relativity value of credit history by fitting to a truncated normal distribution
+    :param credit_dict: dictionary of credit value buckets
+    :param agg_credit_dict: dictionary of aggregated credit values
+    :return: relativity score
+    """
     # agg_credit_score = {"300-579": 0, "580-669": 0, "670-739": 0,
     #               "740-799": 0, "800-850": 0}
     relativity = 1
@@ -116,10 +128,13 @@ def get_credit_relativity(credit_dict, agg_credit_dict):
     return relativity
 
 
-def get_general_relativity(val_dict, agg_dict, variable):
+def get_general_relativity(val_dict: dict, agg_dict: dict, variable: object) -> float:
     """
-    Finds random relativity of varibales not associated with any distribution
-    :return: relativity
+    Finds random relativity of variables not associated with any distribution
+    :param val_dict: Dictionary of relativity buckets
+    :param agg_dict: Dictionary of aggregated relativity buckets
+    :param variable:
+    :return: Relativity value
     """
     d = val_dict[variable]
     x = np.random.randint(0, len(d))
@@ -129,11 +144,11 @@ def get_general_relativity(val_dict, agg_dict, variable):
     return relativity
 
 
-def get_relativity(info_dict, agg_dict):
+def get_relativity(info_dict: dict, agg_dict: dict) -> dict:
     """
-
-    :param agg_dict:
-    :param info_dict:
+    This function calculates the relativity value for each factor bucket involved in our model
+    :param agg_dict: A dictionary of aggregated relativity values of all buckets
+    :param info_dict: A dictionary of relativity values of all buckets
     :return: dictionary with relativity values
     """
     age_relativity = get_age_relativity(info_dict['age'], agg_dict['age'])
@@ -163,10 +178,10 @@ def get_relativity(info_dict, agg_dict):
     return relativity_dict
 
 
-def cal_relativity(number_of_customers):
+def cal_relativity(no_cust: int) -> tuple[list, float, list]:
     """
     Finds final relativity of each customer and the total premium of all the customers
-    :param number_of_customers:
+    :param no_cust: The number of customers in the customer pool
     :return: list with aggregate relativity for each customer
     """
     relativities = []
@@ -175,7 +190,7 @@ def cal_relativity(number_of_customers):
     total_premium = 0
     info_dict, agg_list = dict_generator()
 
-    for i in range(0, number_of_customers):
+    for i in range(0, no_cust):
         relativity_per_customer = 1
         data_dict = get_relativity(info_dict, agg_list)
         for column, relativity in data_dict.items():
@@ -189,9 +204,10 @@ def cal_relativity(number_of_customers):
     return relativities, round(total_premium, 3), coverage_levels
 
 
-def find_total_claim_amt(no_cust):
+def find_total_claim_amt(no_cust: int) -> float:
     """
     This function finds probability of claim via poisson dist and severity of claim via
+    :param no_cust: The number of customers in the customer pool
     :return: probability of claim for each customer
     """
     rel, total_premium, coverages_rel = cal_relativity(no_cust)
@@ -208,9 +224,10 @@ def find_total_claim_amt(no_cust):
     return round(total_claim_amount, 3)
 
 
-def find_claim_severity(coverage_relativity):
+def find_claim_severity(coverage_relativity: list) -> float:
     """
     This function finds the claim severity by fitting the relativity into a normal distribution
+    :coverage_relativity: a list of coverage relativity levels
     :return: Returns a number which is the claim severity
     """
     coverage_bucket_dict = dict_generator()[0]['coverage_level']
@@ -222,9 +239,10 @@ def find_claim_severity(coverage_relativity):
     return round(claim_val, 2)
 
 
-def bin_relativity(rel_list):
+def bin_relativity(rel_list: list) -> list:
     """
     This function bins the relativity values at different integer levels to be used for fitting to various distributions
+    :rel_list: a list of relativity values
     :return: List of binned relativity values
     """
     rel_int: list[int] = []
@@ -252,9 +270,9 @@ def bin_relativity(rel_list):
     return rel_int
 
 
-def find_SD():
+def find_sd() -> list:
     """
-    calculated standard deviation of each bucket
+    This function calculates the standard deviation of each bucket
     :return: a list with standard deviations of each bucket
     """
     info_dict, agg_list = dict_generator()
@@ -264,17 +282,18 @@ def find_SD():
     return sd_dict
 
 
-def optimize_profit(no_of_cust):
+def optimize_profit(no_of_cust: int):
     """
-
-    :return:
+    This function calculates the net profit/loss of the insurer based  on the total revenue from premium and total
+    claim amount
+    :param no_of_cust: The number of customers in the customer pool
+    :return: Total p/l from premium
     """
-    n = 1
-    info_dict, agg_dict = dict_generator()
-    rel_dict = get_relativity(info_dict, agg_dict)
-    sd = find_SD()
-    # for v in range(len(rel_dict)):"""
-
+    # n = 1
+    # info_dict, agg_dict = dict_generator()
+    # rel_dict = get_relativity(info_dict, agg_dict)
+    # sd = find_sd()
+    # # for v in range(len(rel_dict)):"""
     total_revenue_from_premium = cal_relativity(no_of_cust)[1]
     print("Total revenue earned from insurance premium: {}".format(total_revenue_from_premium))
     total_claim_val = find_total_claim_amt(no_of_cust)
@@ -285,7 +304,6 @@ def optimize_profit(no_of_cust):
 
 # UNUSED FUNCTIONS BLOCK
 def calculate_premium(df):
-
     baseline_premium = 1600
     df['Relativity'] = df['Age'] * df['Driving_History_DUI'] * df['Driving_History_reckless'] * \
                        df['Driving_History_speeding'] * df['Credit_Score'] * df['Years_of_Driving'] * df['Location'] * \
@@ -296,7 +314,6 @@ def calculate_premium(df):
 
 
 def create_df(number_of_customers):
-
     column_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless', 'Driving_History_speeding' 'Credit_Score',
                     'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
                     'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
@@ -320,8 +337,5 @@ def create_df(number_of_customers):
 
 if __name__ == '__main__':
     # cal_relativity(5000)
-    optimize_profit(10000)
+    optimize_profit(10)
     # find_claim_severity(1)
-
-
-
