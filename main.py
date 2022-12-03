@@ -13,25 +13,29 @@ import numpy as np
 from scipy.stats.distributions import poisson
 from scipy.stats import truncnorm
 import statistics
-
 import warnings
-
 warnings.filterwarnings("ignore")
 
 
 def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
     """Returns randomly generated value from normal distribution with a set maximum and minimum value
     :return: Random floating point number
+    >>> get_truncated_normal(mean=40, sd=20, low=18, upp=80).rvs() in range(18, 80)
+    True
+    >>> get_truncated_normal(mean=700, sd=100, low=350, upp=850).rvs() in range(350, 850)
+    True
     """
     return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator() -> tuple[dict, dict]:
+def dict_generator():
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
     :return: List of dictionaries
+    >>> dict_generator()
+    ({'age': {'18-24 years': 1.2, '25-45 years': 1, '45-60 years': 1.15, '60+ years': 1.25}, 'driving_hist_dui': {'No': 1, 'Yes': 1.2}, 'driving_hist_reckless': {'No': 1, 'Yes': 1.1}, 'driving_hist_speeding': {'No': 1, 'Yes': 1.05}, 'credit_score': {'300-579': 1.2, '580-669': 1.1, '670-739': 1, '740-799': 0.95, '800-850': 0.88}, 'driving_exp': {'less than 1 year': 1.1, '1-5 years': 1.05, '6-15 years': 1, '15+ years': 0.97}, 'location': {'Urban': 1.05, 'Rural': 0.97, 'Suburban': 1}, 'insurance_hist': {'No coverage': 1.2, 'Coverage (past 6 months)': 1.05, 'Coverage (past 1 year)': 1.05}, 'annual_mileage': {'0-7500 miles': 1, '7500-10000 miles': 1.1, '10001-15000 miles': 1.15, '15000+ miles': 1.2}, 'marital_status': {'Married': 0.95, 'Single/Divorced/Widowed': 1}, 'claims_hist': {'Filed within last 1 year': 1.25, 'Filed within last 1-3 years': 1.15, 'No claims filed': 1}, 'coverage_level': {'10000-20000': 0.7, '20000-30000': 0.8, '30000-40000': 1, '40000-50000': 1.15, '50000-60000': 1.3, '60000-70000': 1.45, '70000-80000': 1.6, '80000-90000': 1.75, '90000-100000': 1.9, '100000-110000': 2.05, '110000-120000': 2.2, '120000-130000': 2.35, '130000-140000': 2.5, '140000-150000': 2.7}, 'deductible': {'No deductible': 1.2, '$250': 1, '$500': 0.9, '$1000': 0.8}, 'vehicle_safety': {'0 NCAP': 1.15, '1 NCAP': 1.1, '2 NCAP': 1.05, '3 NCAP': 1, '4 NCAP': 0.95, '5 NCAP': 0.9}}, {'age': {'18-24 years': 0, '25-45 years': 0, '45-60 years': 0, '60+ years': 0}, 'driving_hist_dui': {'No': 0, 'Yes': 0}, 'driving_hist_reckless': {'No': 0, 'Yes': 0}, 'driving_hist_speeding': {'No': 0, 'Yes': 0}, 'credit_score': {'300-579': 0, '580-669': 0, '670-739': 0, '740-799': 0, '800-850': 0}, 'driving_exp': {'less than 1 year': 0, '1-5 years': 0, '6-15 years': 0, '15+ years': 0}, 'location': {'Urban': 0, 'Rural': 0, 'Suburban': 0}, 'insurance_hist': {'No coverage': 0, 'Coverage (past 6 months)': 0, 'Coverage (past 1 year)': 0}, 'annual_mileage': {'0-7500 miles': 0, '7500-10000 miles': 0, '10001-15000 miles': 0, '15000+ miles': 0}, 'marital_status': {'Married': 0, 'Single/Divorced/Widowed': 0}, 'claims_hist': {'Filed within last 1 year': 0, 'Filed within last 1-3 years': 0, 'No claims filed': 0}, 'coverage_level': {'10000-20000': 0, '20000-30000': 0, '30000-40000': 0, '40000-50000': 0, '50000-60000': 0, '60000-70000': 0, '70000-80000': 0, '80000-90000': 0, '90000-100000': 0, '100000-110000': 0, '110000-120000': 0, '120000-130000': 0, '130000-140000': 0, '140000-150000': 0}, 'deductible': {'No deductible': 0, '$250': 0, '$500': 0, '$1000': 0}, 'vehicle_safety': {'0 NCAP': 0, '1 NCAP': 0, '2 NCAP': 0, '3 NCAP': 0, '4 NCAP': 0, '5 NCAP': 0}})
     """
     age = {"18-24 years": 1.2, "25-45 years": 1, "45-60 years": 1.15,
            "60+ years": 1.25}
@@ -78,6 +82,11 @@ def get_age_relativity(age_dict: dict, agg_age_dict: dict) -> float:
     :param age_dict: dictionary of age value buckets
     :param agg_age_dict: dictionary of aggregated age values
     :return: relativity score
+    >>> a, b = dict_generator()
+    >>> get_age_relativity(a, b) in [1.2, 1, 1.15, 1.25]
+    True
+    >>> get_age_relativity(a, b) not in [1.2, 1, 1.15, 1.25]
+    False
     """
     # agg_age_dict = {"18-24 years": 0, "25-45 years": 0, "45-60 years": 0,
     #            "60+ years": 0}
@@ -103,6 +112,8 @@ def get_credit_relativity(credit_dict: dict, agg_credit_dict: dict) -> float:
     :param credit_dict: dictionary of credit value buckets
     :param agg_credit_dict: dictionary of aggregated credit values
     :return: relativity score
+    c, ac = dict_generator()
+    get_credit_relativity(c, ac) in []
     """
     # agg_credit_score = {"300-579": 0, "580-669": 0, "670-739": 0,
     #               "740-799": 0, "800-850": 0}
@@ -133,6 +144,8 @@ def get_general_relativity(val_dict: dict, agg_dict: dict, variable: object) -> 
     :param agg_dict: Dictionary of aggregated relativity buckets
     :param variable:
     :return: Relativity value
+    >>> a, b =  dict_generator()
+    >>> get_general_relativity(a, b, )
     """
     d = val_dict[variable]
     x = np.random.randint(0, len(d))
@@ -148,6 +161,12 @@ def get_relativity(info_dict: dict, agg_dict: dict) -> dict:
     :param agg_dict: A dictionary of aggregated relativity values of all buckets
     :param info_dict: A dictionary of relativity values of all buckets
     :return: dictionary with relativity values
+    >>> random.seed(30)
+    >>> a, b  = dict_generator()
+    >>> get_relativity(a, b, 'driving_hist_dui')
+
+    {'Age': 1, 'Driving_History_DUI': 1, 'Driving_History_reckless': 1.1, 'Driving_History_speeding': 1.05, 'Credit_Score': 1.1, 'Years_of_Driving': 1, 'Location': 1.05, 'Insurance_History': 1.05, 'Annual_Mileage': 1.1, 'Marital_Status': 1, 'Claims_History': 1.25, 'Coverage_level': 1, 'Deductible': 0.8, 'Vehicle': 0.95}
+
     """
     age_relativity = get_age_relativity(info_dict['age'], agg_dict['age'])
     driving_history_dui_relativity = get_general_relativity(info_dict, agg_dict, 'driving_hist_dui')
@@ -176,7 +195,7 @@ def get_relativity(info_dict: dict, agg_dict: dict) -> dict:
     return relativity_dict
 
 
-def cal_relativity(no_cust: int) -> tuple[list, float, list]:
+def cal_relativity(no_cust: int):
     """
     Finds final relativity of each customer and the total premium of all the customers
     :param no_cust: The number of customers in the customer pool
@@ -303,6 +322,7 @@ def optimize_profit(no_of_cust: int):
 
 # UNUSED FUNCTIONS BLOCK
 def calculate_premium(df):
+
     baseline_premium = 1600
     df['Relativity'] = df['Age'] * df['Driving_History_DUI'] * df['Driving_History_reckless'] * \
                        df['Driving_History_speeding'] * df['Credit_Score'] * df['Years_of_Driving'] * df['Location'] * \
@@ -313,6 +333,7 @@ def calculate_premium(df):
 
 
 def create_df(number_of_customers):
+
     column_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless', 'Driving_History_speeding' 'Credit_Score',
                     'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
                     'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
@@ -332,9 +353,9 @@ def create_df(number_of_customers):
              "Vehicle": data[13]}, ignore_index=True)
     # print(fm_dataframe.head())
     calculate_premium(fm_dataframe)
-
+ 
 
 if __name__ == '__main__':
     # cal_relativity(5000)
-    optimize_profit(1000)
+    optimize_profit(500)
     # find_claim_severity(1)
