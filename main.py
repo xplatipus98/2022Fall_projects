@@ -248,8 +248,8 @@ def find_total_claim_amt(no_cust: int) -> float:
     for coverage_rel in coverages_rel:
         coverage_val = find_claim_severity(coverage_rel)
         claim_sev.append(coverage_val)
-    print("Frequency Probabilities: {}".format(freq_prob))
-    print("Claim severity: {}".format(claim_sev))
+    # print("Frequency Probabilities: {}".format(freq_prob))
+    # print("Claim severity: {}".format(claim_sev))
     total_claim_amount = sum([x * y for x, y in zip(freq_prob, claim_sev)])
     return round(total_claim_amount, 3)
 
@@ -370,13 +370,14 @@ def create_rel_df(n):
     c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
                'Driving_History_speeding', 'Credit_Score',
                'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
-               'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle', 'Premium']
+               'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle', 'Combine_relativity_per_customer', 'Premium']
     df = pd.DataFrame(columns=c_names)
     a, b = dict_generator()
     rel, total_premium, coverages_rel, p_per_cust = cal_relativity(n)
     for i in range(0, n):
         r = get_relativity(a, b)
         # print(r)
+        r['Combine_relativity_per_customer'] = rel[i]
         r['Premium'] = p_per_cust[i]
         df.loc[i] = r
     return df
@@ -390,4 +391,8 @@ if __name__ == '__main__':
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
     print(create_rel_df(50))
+    total_prem = create_rel_df(50)['Premium'].sum()
     # print(get_relativity(a, b))
+    claims = find_total_claim_amt(50)
+    # print(total_prem - claims)
+
