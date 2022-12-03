@@ -18,7 +18,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-
 def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
     """Returns randomly generated value from normal distribution with a set maximum and minimum value
     :return: Random floating point number
@@ -365,10 +364,26 @@ def create_df(number_of_customers):
     calculate_premium(fm_dataframe)
 
 
+def create_rel_df(n):
+    c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
+               'Driving_History_speeding' 'Credit_Score',
+               'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
+               'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
+    df = pd.DataFrame(columns=c_names)
+    a, b = dict_generator()
+    for i in range(0, n):
+        r = get_relativity(a, b)
+        # print(r)
+        df.loc[i] = r
+    return df
+
+
 if __name__ == '__main__':
-    # cal_relativity(5000)
+    # cal_relativity(50)
     # optimize_profit(500)
     # find_claim_severity(1)
-    random.seed(30)
+    # random.seed(30)
     a, b = dict_generator()
-    print(len(get_relativity(a, b)))
+    # print(len(get_relativity(a, b)))
+    print(create_rel_df(50))
+    # print(get_relativity(a, b))
