@@ -356,16 +356,13 @@ def create_rel_df(n):
     def threshold_calculator(row):
         if row['Age'] == 1:
             return 4500
-            # df['Threshold_premium'] = 4500
         elif row['Age'] == 1.2:
             return 3000
-            # df['Threshold_premium'] = 3000
         elif row['Age'] == 1.15:
             return 3500
-            # df['Threshold_premium'] = 3500
         else:
             return 2800
-            # df['Threshold_premium'] = 2800
+
     df['Threshold_premium'] = df.apply(lambda row: threshold_calculator(row), axis=1)
     print("increasing premiums now..........................")
     while df['Premium'].sum() >= 0:
@@ -382,13 +379,21 @@ def increase_premiums(df):
     sum_premium = df['Premium'].sum()
     while sum_premium > 0:
         df['Premium'] = df['Premium'] * 1.01
-        if df['Threshold_premium'].any() <= df['Premium'].any():
-            df['Customer_dropped'] = 1
-        else:
-            df['Customer_dropped'] = 0
+
+        def customer_churn(row):
+            """
+
+            :param row:
+            :return:
+            """
+            if row['Threshold_premium'] < row['Premium']:
+                return 1
+            else:
+                return 0
+        df['Customer_dropped'] = df.apply(lambda row: customer_churn(row), axis=1)
         df_retained_cust = df[df['Customer_dropped'] == 0]
         sum_premium = df_retained_cust['Premium'].sum()
-        print(df.head(100))
+        print(df.describe())
     return df
 
 
