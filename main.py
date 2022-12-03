@@ -213,6 +213,7 @@ def cal_relativity(no_cust: int):
     :return: list with aggregate relativity for each customer
     """
     relativities = []
+    premium_per_customer = []
     coverage_levels = []
     base_premium = 1600  # assumption
     total_premium = 0
@@ -226,10 +227,11 @@ def cal_relativity(no_cust: int):
             if column == 'Coverage_level':
                 coverage_levels.append(relativity)
         relativities.append(relativity_per_customer)
+        premium_per_customer.append(base_premium * relativity_per_customer)
         total_premium = total_premium + (base_premium * relativity_per_customer)
     # print(relativities)
     # print("Total premium: {}".format(total_premium))
-    return relativities, round(total_premium, 3), coverage_levels
+    return relativities, round(total_premium, 3), coverage_levels, premium_per_customer
 
 
 def find_total_claim_amt(no_cust: int) -> float:
@@ -238,7 +240,7 @@ def find_total_claim_amt(no_cust: int) -> float:
     :param no_cust: The number of customers in the customer pool
     :return: probability of claim for each customer
     """
-    rel, total_premium, coverages_rel = cal_relativity(no_cust)
+    rel, total_premium, coverages_rel, p_per_cust = cal_relativity(no_cust)
     # bin the relativity scores as poisson pmf function cannot directly fit floating point values of relativity
     relativity_int = bin_relativity(rel)
     freq_prob = poisson.pmf(relativity_int, statistics.mean(rel))
@@ -366,14 +368,16 @@ def create_df(number_of_customers):
 
 def create_rel_df(n):
     c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
-               'Driving_History_speeding' 'Credit_Score',
+               'Driving_History_speeding', 'Credit_Score',
                'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
-               'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
+               'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle', 'Premium']
     df = pd.DataFrame(columns=c_names)
     a, b = dict_generator()
+    rel, total_premium, coverages_rel, p_per_cust = cal_relativity(n)
     for i in range(0, n):
         r = get_relativity(a, b)
         # print(r)
+        r['Premium'] = p_per_cust[i]
         df.loc[i] = r
     return df
 
