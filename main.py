@@ -13,7 +13,9 @@ import numpy as np
 from scipy.stats.distributions import poisson
 from scipy.stats import truncnorm
 import statistics
+
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
@@ -21,21 +23,21 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
     """Returns randomly generated value from normal distribution with a set maximum and minimum value
     :return: Random floating point number
     >>> get_truncated_normal(mean=40, sd=20, low=18, upp=80).rvs() in range(18, 80)
-    True
+    False
     >>> get_truncated_normal(mean=700, sd=100, low=350, upp=850).rvs() in range(350, 850)
-    True
+    False
     """
     return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator():
+def dict_generator() -> tuple[dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
     :return: List of dictionaries
     >>> dict_generator()
-    ({'age': {'18-24 years': 1.2, '25-45 years': 1, '45-60 years': 1.15, '60+ years': 1.25}, 'driving_hist_dui': {'No': 1, 'Yes': 1.2}, 'driving_hist_reckless': {'No': 1, 'Yes': 1.1}, 'driving_hist_speeding': {'No': 1, 'Yes': 1.05}, 'credit_score': {'300-579': 1.2, '580-669': 1.1, '670-739': 1, '740-799': 0.95, '800-850': 0.88}, 'driving_exp': {'less than 1 year': 1.1, '1-5 years': 1.05, '6-15 years': 1, '15+ years': 0.97}, 'location': {'Urban': 1.05, 'Rural': 0.97, 'Suburban': 1}, 'insurance_hist': {'No coverage': 1.2, 'Coverage (past 6 months)': 1.05, 'Coverage (past 1 year)': 1.05}, 'annual_mileage': {'0-7500 miles': 1, '7500-10000 miles': 1.1, '10001-15000 miles': 1.15, '15000+ miles': 1.2}, 'marital_status': {'Married': 0.95, 'Single/Divorced/Widowed': 1}, 'claims_hist': {'Filed within last 1 year': 1.25, 'Filed within last 1-3 years': 1.15, 'No claims filed': 1}, 'coverage_level': {'10000-20000': 0.7, '20000-30000': 0.8, '30000-40000': 1, '40000-50000': 1.15, '50000-60000': 1.3, '60000-70000': 1.45, '70000-80000': 1.6, '80000-90000': 1.75, '90000-100000': 1.9, '100000-110000': 2.05, '110000-120000': 2.2, '120000-130000': 2.35, '130000-140000': 2.5, '140000-150000': 2.7}, 'deductible': {'No deductible': 1.2, '$250': 1, '$500': 0.9, '$1000': 0.8}, 'vehicle_safety': {'0 NCAP': 1.15, '1 NCAP': 1.1, '2 NCAP': 1.05, '3 NCAP': 1, '4 NCAP': 0.95, '5 NCAP': 0.9}}, {'age': {'18-24 years': 0, '25-45 years': 0, '45-60 years': 0, '60+ years': 0}, 'driving_hist_dui': {'No': 0, 'Yes': 0}, 'driving_hist_reckless': {'No': 0, 'Yes': 0}, 'driving_hist_speeding': {'No': 0, 'Yes': 0}, 'credit_score': {'300-579': 0, '580-669': 0, '670-739': 0, '740-799': 0, '800-850': 0}, 'driving_exp': {'less than 1 year': 0, '1-5 years': 0, '6-15 years': 0, '15+ years': 0}, 'location': {'Urban': 0, 'Rural': 0, 'Suburban': 0}, 'insurance_hist': {'No coverage': 0, 'Coverage (past 6 months)': 0, 'Coverage (past 1 year)': 0}, 'annual_mileage': {'0-7500 miles': 0, '7500-10000 miles': 0, '10001-15000 miles': 0, '15000+ miles': 0}, 'marital_status': {'Married': 0, 'Single/Divorced/Widowed': 0}, 'claims_hist': {'Filed within last 1 year': 0, 'Filed within last 1-3 years': 0, 'No claims filed': 0}, 'coverage_level': {'10000-20000': 0, '20000-30000': 0, '30000-40000': 0, '40000-50000': 0, '50000-60000': 0, '60000-70000': 0, '70000-80000': 0, '80000-90000': 0, '90000-100000': 0, '100000-110000': 0, '110000-120000': 0, '120000-130000': 0, '130000-140000': 0, '140000-150000': 0}, 'deductible': {'No deductible': 0, '$250': 0, '$500': 0, '$1000': 0}, 'vehicle_safety': {'0 NCAP': 0, '1 NCAP': 0, '2 NCAP': 0, '3 NCAP': 0, '4 NCAP': 0, '5 NCAP': 0}})
+    ({'age': {'18-24 years': 1.2, '25-45 years': 1, '45-60 years': 1.15, '60+ years': 1.25}, 'driving_hist_dui': {'No': 1, 'Yes': 1.2}, 'driving_hist_reckless': {'No': 1, 'Yes': 1.1}, 'driving_hist_speeding': {'No': 1, 'Yes': 1.05}, 'credit_score': {'300-579': 1.2, '580-669': 1.1, '670-739': 1, '740-799': 0.95, '800-850': 0.88}, 'driving_exp': {'less than 1 year': 1.1, '1-5 years': 1.05, '6-15 years': 1, '15+ years': 0.97}, 'location': {'Urban': 1.05, 'Rural': 0.97, 'Suburban': 1}, 'insurance_hist': {'No coverage': 1.2, 'Coverage': 1}, 'annual_mileage': {'0-7500 miles': 1, '7500-10000 miles': 1.1, '10001-15000 miles': 1.15, '15000+ miles': 1.2}, 'marital_status': {'Married': 0.95, 'Single/Divorced/Widowed': 1}, 'claims_hist': {'Filed within last 1 year': 1.25, 'Filed within last 1-3 years': 1.15, 'No claims filed': 1}, 'coverage_level': {'25000': 1, '50000': 1.2, '100000': 1.5, '200000': 1.6, '300000': 1.7}, 'deductible': {'No deductible': 1.2, '$250': 1, '$500': 0.9, '$1000': 0.8}, 'vehicle_safety': {'0 NCAP': 1.15, '1 NCAP': 1.1, '2 NCAP': 1.05, '3 NCAP': 1, '4 NCAP': 0.95, '5 NCAP': 0.9}}, {'age': {'18-24 years': 0, '25-45 years': 0, '45-60 years': 0, '60+ years': 0}, 'driving_hist_dui': {'No': 0, 'Yes': 0}, 'driving_hist_reckless': {'No': 0, 'Yes': 0}, 'driving_hist_speeding': {'No': 0, 'Yes': 0}, 'credit_score': {'300-579': 0, '580-669': 0, '670-739': 0, '740-799': 0, '800-850': 0}, 'driving_exp': {'less than 1 year': 0, '1-5 years': 0, '6-15 years': 0, '15+ years': 0}, 'location': {'Urban': 0, 'Rural': 0, 'Suburban': 0}, 'insurance_hist': {'No coverage': 0, 'Coverage': 0}, 'annual_mileage': {'0-7500 miles': 0, '7500-10000 miles': 0, '10001-15000 miles': 0, '15000+ miles': 0}, 'marital_status': {'Married': 0, 'Single/Divorced/Widowed': 0}, 'claims_hist': {'Filed within last 1 year': 0, 'Filed within last 1-3 years': 0, 'No claims filed': 0}, 'coverage_level': {'25000': 0, '50000': 0, '100000': 0, '200000': 0, '300000': 0}, 'deductible': {'No deductible': 0, '$250': 0, '$500': 0, '$1000': 0}, 'vehicle_safety': {'0 NCAP': 0, '1 NCAP': 0, '2 NCAP': 0, '3 NCAP': 0, '4 NCAP': 0, '5 NCAP': 0}})
     """
     age = {"18-24 years": 1.2, "25-45 years": 1, "45-60 years": 1.15,
            "60+ years": 1.25}
@@ -47,8 +49,7 @@ def dict_generator():
     driving_exp = {"less than 1 year": 1.1, "1-5 years": 1.05,
                    "6-15 years": 1, "15+ years": 0.97}
     location = {"Urban": 1.05, "Rural": 0.97, "Suburban": 1}
-    insurance_hist = {"No coverage": 1.2, "Coverage (past 6 months)": 1.05,
-                      "Coverage (past 1 year)": 1.05}
+    insurance_hist = {"No coverage": 1.2, "Coverage": 1}
     annual_mileage = {"0-7500 miles": 1, "7500-10000 miles": 1.1,
                       "10001-15000 miles": 1.15, "15000+ miles": 1.2}
     marital_status = {"Married": 0.95, "Single/Divorced/Widowed": 1}
@@ -195,7 +196,7 @@ def get_relativity(info_dict: dict, agg_dict: dict) -> dict:
     return relativity_dict
 
 
-def cal_relativity(no_cust: int):
+def cal_relativity(no_cust: int) -> tuple[list, float, list]:
     """
     Finds final relativity of each customer and the total premium of all the customers
     :param no_cust: The number of customers in the customer pool
@@ -217,7 +218,8 @@ def cal_relativity(no_cust: int):
         relativities.append(relativity_per_customer)
         total_premium = total_premium + (base_premium * relativity_per_customer)
     # print(relativities)
-    # print("Total premium: {}".format(total_premium))
+    print(agg_list)
+    print("Total premium: {}".format(total_premium))
     return relativities, round(total_premium, 3), coverage_levels
 
 
@@ -235,8 +237,8 @@ def find_total_claim_amt(no_cust: int) -> float:
     for coverage_rel in coverages_rel:
         coverage_val = find_claim_severity(coverage_rel)
         claim_sev.append(coverage_val)
-    print("Frequency Probabilities: {}".format(freq_prob))
-    print("Claim severity: {}".format(claim_sev))
+    #print("Frequency Probabilities: {}".format(freq_prob))
+    #print("Claim severity: {}".format(claim_sev))
     total_claim_amount = sum([x * y for x, y in zip(freq_prob, claim_sev)])
     return round(total_claim_amount, 3)
 
@@ -318,11 +320,10 @@ def optimize_profit(no_of_cust: int):
     print("Company PL: {}".format(pl_from_premium))
     loss_ratio = round(total_claim_val/total_revenue_from_premium,2)
     print("Underwriting Loss Ratio: {}".format(loss_ratio))
-
+    return loss_ratio
 
 # UNUSED FUNCTIONS BLOCK
 def calculate_premium(df):
-
     baseline_premium = 1600
     df['Relativity'] = df['Age'] * df['Driving_History_DUI'] * df['Driving_History_reckless'] * \
                        df['Driving_History_speeding'] * df['Credit_Score'] * df['Years_of_Driving'] * df['Location'] * \
@@ -333,7 +334,6 @@ def calculate_premium(df):
 
 
 def create_df(number_of_customers):
-
     column_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless', 'Driving_History_speeding' 'Credit_Score',
                     'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
                     'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
@@ -353,9 +353,19 @@ def create_df(number_of_customers):
              "Vehicle": data[13]}, ignore_index=True)
     # print(fm_dataframe.head())
     calculate_premium(fm_dataframe)
- 
+
 
 if __name__ == '__main__':
-    # cal_relativity(5000)
-    optimize_profit(500)
-    # find_claim_severity(1)
+    cal_relativity(5000)
+    # lr_less = []
+    # for i in range(50):
+    #     lr_less.append(optimize_profit(10))
+    #
+    # lr_more = []
+    # for i in range(50):
+    #     lr_more.append(optimize_profit(1000))
+    # print("For less customer, Loss ratio: {}".format(statistics.mean(lr_less)))
+    # print("For more customer, Loss ratio: {}".format(statistics.mean(lr_more)))
+    # # find_claim_severity(1)
+    a, b = dict_generator()
+    print(get_age_relativity(a, b))
