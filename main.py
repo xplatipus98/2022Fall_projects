@@ -32,7 +32,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator() -> tuple[dict, dict]:
+def dict_generator() -> [dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -337,23 +337,34 @@ def optimize_profit(no_of_cust: int):
 
 
 def create_rel_df(n):
+    """
+    Creates a dataframe with relativity of all the variables for each customer, overall relativity per customer,
+    individual premiums, threshold premium (based on customer's age), and whether the customer dropped the insurance
+    premium or not.
+    :param n: number of customers
+    :return: dataframe with individual customer data
+    """
     c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
                'Driving_History_speeding', 'Credit_Score',
                'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
                'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle', 'Combine_relativity_per_customer',
                'Premium']
     df = pd.DataFrame(columns=c_names)
-    a, b = dict_generator()
+    info_dict, agg_dict = dict_generator()
     rel, total_premium, coverages_rel, p_per_cust = cal_relativity(n)
     for i in range(0, n):
-        r = get_relativity(a, b)
-        # print(r)
-        r['Combine_relativity_per_customer'] = rel[i]
-        r['Premium'] = p_per_cust[i]
-        df.loc[i] = r
+        per_cust_data = get_relativity(info_dict, agg_dict)
+        per_cust_data['Combine_relativity_per_customer'] = rel[i]
+        per_cust_data['Premium'] = p_per_cust[i]
+        df.loc[i] = per_cust_data
 
     # threshold_1, threshold_2, threshold_3, threshold_4 = 0
     def threshold_calculator(row):
+        """
+        Calculates threshold premium for each customer based on his/her age.
+        :param row: data of each customer
+        :return: threshold premium (int)
+        """
         if row['Age'] == 1:
             return 2800
         elif row['Age'] == 1.2:
@@ -384,8 +395,10 @@ def increase_premiums(df, n):
 
         def customer_churn(row):
             """
-            :param row:
-            :return:
+            Returns boolean based on whether the premium of each customer is greater than the threshold premium of that
+            customer. If it returns 1, means the customer has dropped the premium, else not.
+            :param row: data of each customer (one row of the dataframe)
+            :return: boolean (1/0)
             """
             if row['Threshold_premium'] < row['Premium']:
                 return 1
