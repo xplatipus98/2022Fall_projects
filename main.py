@@ -32,7 +32,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator():
+def dict_generator() -> tuple[dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -45,6 +45,7 @@ def dict_generator():
     driving_hist_dui = {"No": 1, "Yes": 1.2}
     driving_hist_reckless = {"No": 1, "Yes": 1.1}
     driving_hist_speeding = {"No": 1, "Yes": 1.05}
+
     credit_score = {"300-579": 1.2, "580-669": 1.1, "670-739": 1,
                     "740-799": 0.95, "800-850": 0.88}
     driving_exp = {"less than 1 year": 1.1, "1-5 years": 1.05,
@@ -209,6 +210,8 @@ def get_relativity(info_dict: dict, agg_dict: dict) -> dict:
 def cal_relativity(no_cust: int):
     """
     Finds final relativity of each customer and the total premium of all the customers
+    :param base_premium: The value of baseline premium, this value will keep updating in the increase_premium function
+    until a point that the total profit of the company comes to zero as customers will drop.
     :param no_cust: The number of customers in the customer pool
     :return: list with aggregate relativity for each customer
     """
@@ -248,8 +251,8 @@ def find_total_claim_amt(no_cust: int) -> float:
     for coverage_rel in coverages_rel:
         coverage_val = find_claim_severity(coverage_rel)
         claim_sev.append(coverage_val)
-    print("Frequency Probabilities: {}".format(freq_prob))
-    print("Claim severity: {}".format(claim_sev))
+    # print("Frequency Probabilities: {}".format(freq_prob))
+    # print("Claim severity: {}".format(claim_sev))
     total_claim_amount = sum([x * y for x, y in zip(freq_prob, claim_sev)])
     return round(total_claim_amount, 3)
 
@@ -333,6 +336,67 @@ def optimize_profit(no_of_cust: int):
     print("Underwriting Loss Ratio: {}".format(loss_ratio))
 
 
+def create_rel_df(n):
+    c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
+               'Driving_History_speeding', 'Credit_Score',
+               'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
+               'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle', 'Combine_relativity_per_customer',
+               'Premium']
+    df = pd.DataFrame(columns=c_names)
+    a, b = dict_generator()
+    rel, total_premium, coverages_rel, p_per_cust = cal_relativity(n)
+    for i in range(0, n):
+        r = get_relativity(a, b)
+        # print(r)
+        r['Combine_relativity_per_customer'] = rel[i]
+        r['Premium'] = p_per_cust[i]
+        df.loc[i] = r
+
+    # threshold_1, threshold_2, threshold_3, threshold_4 = 0
+    def threshold_calculator(row):
+        if row['Age'] == 1:
+            return 4500
+        elif row['Age'] == 1.2:
+            return 3000
+        elif row['Age'] == 1.15:
+            return 3500
+        else:
+            return 2800
+
+    df['Threshold_premium'] = df.apply(lambda row: threshold_calculator(row), axis=1)
+    print("increasing premiums now..........................")
+    while df['Premium'].sum() >= 0:
+        df = increase_premiums(df)
+    return df
+
+
+def increase_premiums(df):
+    """
+    This function will increase the premiums of the customers and see how many customers are getting dropped based on
+    their threshold premium values.
+    :return: Dataframe with additional columns
+    """
+    sum_premium = df['Premium'].sum()
+    while sum_premium > 0:
+        df['Premium'] = df['Premium'] * 1.01
+
+        def customer_churn(row):
+            """
+
+            :param row:
+            :return:
+            """
+            if row['Threshold_premium'] < row['Premium']:
+                return 1
+            else:
+                return 0
+        df['Customer_dropped'] = df.apply(lambda row: customer_churn(row), axis=1)
+        df_retained_cust = df[df['Customer_dropped'] == 0]
+        sum_premium = df_retained_cust['Premium'].sum()
+        print(df.describe())
+    return df
+
+
 # UNUSED FUNCTIONS BLOCK
 def calculate_premium(df):
     baseline_premium = 1600
@@ -366,28 +430,13 @@ def create_df(number_of_customers):
     calculate_premium(fm_dataframe)
 
 
-def create_rel_df(n):
-    c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
-               'Driving_History_speeding', 'Credit_Score',
-               'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
-               'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle', 'Premium']
-    df = pd.DataFrame(columns=c_names)
-    a, b = dict_generator()
-    rel, total_premium, coverages_rel, p_per_cust = cal_relativity(n)
-    for i in range(0, n):
-        r = get_relativity(a, b)
-        # print(r)
-        r['Premium'] = p_per_cust[i]
-        df.loc[i] = r
-    return df
-
-
 if __name__ == '__main__':
-    # cal_relativity(50)
-    # optimize_profit(500)
+    # cal_relativity(5000)
+    # optimize_profit(1000)
     # find_claim_severity(1)
-    # random.seed(30)
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
     print(create_rel_df(50))
+    total_prem = create_rel_df(50)['Premium'].sum()
     # print(get_relativity(a, b))
+    claims = find_total_claim_amt(50)
