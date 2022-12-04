@@ -355,34 +355,33 @@ def create_rel_df(n):
     # threshold_1, threshold_2, threshold_3, threshold_4 = 0
     def threshold_calculator(row):
         if row['Age'] == 1:
-            return 4500
-        elif row['Age'] == 1.2:
-            return 3000
-        elif row['Age'] == 1.15:
-            return 3500
-        else:
             return 2800
+        elif row['Age'] == 1.2:
+            return 3500
+        elif row['Age'] == 1.15:
+            return 3000
+        else:
+            return 4000
 
     df['Threshold_premium'] = df.apply(lambda row: threshold_calculator(row), axis=1)
     print("increasing premiums now..........................")
-    while df['Premium'].sum() >= 0:
-        df = increase_premiums(df)
+    df = increase_premiums(df, n)
     return df
 
 
-def increase_premiums(df):
+def increase_premiums(df, n):
     """
     This function will increase the premiums of the customers and see how many customers are getting dropped based on
     their threshold premium values.
     :return: Dataframe with additional columns
     """
     sum_premium = df['Premium'].sum()
-    while sum_premium > 0:
+    sum_claim = find_total_claim_amt(n)
+    while sum_premium - sum_claim > 0:
         df['Premium'] = df['Premium'] * 1.01
 
         def customer_churn(row):
             """
-
             :param row:
             :return:
             """
@@ -393,7 +392,8 @@ def increase_premiums(df):
         df['Customer_dropped'] = df.apply(lambda row: customer_churn(row), axis=1)
         df_retained_cust = df[df['Customer_dropped'] == 0]
         sum_premium = df_retained_cust['Premium'].sum()
-        print(df.describe())
+    # print(df.describe())
+    print(df['Customer_dropped'].value_counts())
     return df
 
 
