@@ -377,7 +377,9 @@ def increase_premiums(df, n):
     """
     sum_premium = df['Premium'].sum()
     sum_claim = find_total_claim_amt(n)
-    while sum_premium - sum_claim > 0:
+    profit = sum_premium - sum_claim
+    temp = profit
+    while profit >= temp and profit > 0:
         df['Premium'] = df['Premium'] * 1.01
 
         def customer_churn(row):
@@ -392,8 +394,8 @@ def increase_premiums(df, n):
         df['Customer_dropped'] = df.apply(lambda row: customer_churn(row), axis=1)
         df_retained_cust = df[df['Customer_dropped'] == 0]
         sum_premium = df_retained_cust['Premium'].sum()
-    # print(df.describe())
-    print(df['Customer_dropped'].value_counts())
+        temp = profit
+        profit = sum_premium - sum_claim
     return df
 
 
@@ -436,7 +438,7 @@ if __name__ == '__main__':
     # find_claim_severity(1)
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
-    print(create_rel_df(50))
+    print(create_rel_df(100))
     total_prem = create_rel_df(50)['Premium'].sum()
     # print(get_relativity(a, b))
-    claims = find_total_claim_amt(50)
+    # claims = find_total_claim_amt(50)
