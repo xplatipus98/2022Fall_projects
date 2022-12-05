@@ -375,15 +375,13 @@ def create_rel_df(n):
 
         """
         if row['Age'] == 1:
-            return 2800
+            return 3800
         elif row['Age'] == 1.2:
-            return 3500
-        elif row['Age'] == 1.2:
-            return 5000
+            return 5500
         elif row['Age'] == 1.15:
-            return 4500
+            return 5000
         else:
-            return 4000
+            return 6000
 
     df['Threshold_premium'] = df.apply(lambda row: threshold_calculator(row), axis=1)
     print("increasing premiums now..........................")
