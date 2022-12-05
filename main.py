@@ -32,7 +32,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator() -> tuple[dict, dict]:
+def dict_generator() -> [dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -276,6 +276,10 @@ def bin_relativity(rel_list: list) -> list:
     This function bins the relativity values at different integer levels to be used for fitting to various distributions
     :rel_list: a list of relativity values
     :return: List of binned relativity values
+    >>> type(bin_relativity([1, 2, 3]))
+    <class 'list'>
+    >>> bin_relativity([10, 2.1, 3.7, 4.9, 1, 0, 2.4])
+    [10, 5, 8, 9, 1, 1, 5]
     """
     rel_int: list[int] = []
     for value in rel_list:
@@ -302,10 +306,12 @@ def bin_relativity(rel_list: list) -> list:
     return rel_int
 
 
-def find_sd() -> list:
+def find_sd() -> dict:
     """
     This function calculates the standard deviation of each bucket
-    :return: a list with standard deviations of each bucket
+    :return: a dictionary with standard deviations of each bucket
+    >>> type(find_sd())
+    <class 'dict'>
     """
     info_dict, agg_list = dict_generator()
     sd_dict = {}
@@ -337,54 +343,71 @@ def optimize_profit(no_of_cust: int):
 
 
 def create_rel_df(n):
+    """
+    Creates a dataframe with relativity of all the variables for each customer, overall relativity per customer,
+    individual premiums, threshold premium (based on customer's age), and whether the customer dropped the insurance
+    premium or not.
+    :param n: number of customers
+    :return: dataframe with individual customer data
+    >>> type(create_rel_df(10))
+    <class 'pandas.core.frame.DataFrame'>
+    """
     c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
                'Driving_History_speeding', 'Credit_Score',
                'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
                'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle', 'Combine_relativity_per_customer',
                'Premium']
     df = pd.DataFrame(columns=c_names)
-    a, b = dict_generator()
+    info_dict, agg_dict = dict_generator()
     rel, total_premium, coverages_rel, p_per_cust = cal_relativity(n)
     for i in range(0, n):
-        r = get_relativity(a, b)
-        # print(r)
-        r['Combine_relativity_per_customer'] = rel[i]
-        r['Premium'] = p_per_cust[i]
-        df.loc[i] = r
+        per_cust_data = get_relativity(info_dict, agg_dict)
+        per_cust_data['Combine_relativity_per_customer'] = rel[i]
+        per_cust_data['Premium'] = p_per_cust[i]
+        df.loc[i] = per_cust_data
 
     # threshold_1, threshold_2, threshold_3, threshold_4 = 0
     def threshold_calculator(row):
+        """
+        Calculates threshold premium for each customer based on his/her age.
+        :param row: data of each customer
+        :return: threshold premium (int)
+
+        """
         if row['Age'] == 1:
-            return 4500
-        elif row['Age'] == 1.2:
-            return 3000
-        elif row['Age'] == 1.15:
-            return 3500
-        else:
             return 2800
+        elif row['Age'] == 1.2:
+            return 3500
+        elif row['Age'] == 1.15:
+            return 3000
+        else:
+            return 4000
 
     df['Threshold_premium'] = df.apply(lambda row: threshold_calculator(row), axis=1)
-    print("increasing premiums now..........................")
-    while df['Premium'].sum() >= 0:
-        df = increase_premiums(df)
+    # print("increasing premiums now..........................")
+    df = increase_premiums(df, n)
     return df
 
 
-def increase_premiums(df):
+def increase_premiums(df, n):
     """
     This function will increase the premiums of the customers and see how many customers are getting dropped based on
     their threshold premium values.
     :return: Dataframe with additional columns
     """
     sum_premium = df['Premium'].sum()
-    while sum_premium > 0:
+    sum_claim = find_total_claim_amt(n)
+    profit = sum_premium - sum_claim
+    temp = profit
+    while profit >= temp and profit > 0:
         df['Premium'] = df['Premium'] * 1.01
 
         def customer_churn(row):
             """
-
-            :param row:
-            :return:
+            Returns boolean based on whether the premium of each customer is greater than the threshold premium of that
+            customer. If it returns 1, means the customer has dropped the premium, else not.
+            :param row: data of each customer (one row of the dataframe)
+            :return: boolean (1/0)
             """
             if row['Threshold_premium'] < row['Premium']:
                 return 1
@@ -393,7 +416,8 @@ def increase_premiums(df):
         df['Customer_dropped'] = df.apply(lambda row: customer_churn(row), axis=1)
         df_retained_cust = df[df['Customer_dropped'] == 0]
         sum_premium = df_retained_cust['Premium'].sum()
-        print(df.describe())
+        temp = profit
+        profit = sum_premium - sum_claim
     return df
 
 
@@ -436,7 +460,7 @@ if __name__ == '__main__':
     # find_claim_severity(1)
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
-    print(create_rel_df(50))
+    print(create_rel_df(1))
     total_prem = create_rel_df(50)['Premium'].sum()
     # print(get_relativity(a, b))
-    claims = find_total_claim_amt(50)
+    # claims = find_total_claim_amt(50)
