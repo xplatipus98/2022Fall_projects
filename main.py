@@ -32,7 +32,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator() -> [dict, dict]:
+def dict_generator() -> tuple[dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -366,11 +366,11 @@ def create_rel_df(n):
         :return: threshold premium (int)
         """
         if row['Age'] == 1:
-            return 2800
-        elif row['Age'] == 1.2:
             return 3500
+        elif row['Age'] == 1.2:
+            return 5000
         elif row['Age'] == 1.15:
-            return 3000
+            return 4500
         else:
             return 4000
 
@@ -389,7 +389,10 @@ def increase_premiums(df, n):
     sum_premium = df['Premium'].sum()
     sum_claim = find_total_claim_amt(n)
     profit = sum_premium - sum_claim
+    print("Initial Profit: {}".format(profit))
     temp = profit
+    temp_list = []
+    # total customers, base profits, total premium ---->graph of profit up and no of customers down
     while profit >= temp and profit > 0:
         df['Premium'] = df['Premium'] * 1.01
 
@@ -408,7 +411,10 @@ def increase_premiums(df, n):
         df_retained_cust = df[df['Customer_dropped'] == 0]
         sum_premium = df_retained_cust['Premium'].sum()
         temp = profit
+        temp_list.append(temp)
         profit = sum_premium - sum_claim
+        print(df['Customer_dropped'].value_counts())
+    print("Profit later: {}".format(temp_list))
     return df
 
 
@@ -452,6 +458,6 @@ if __name__ == '__main__':
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
     print(create_rel_df(100))
-    total_prem = create_rel_df(50)['Premium'].sum()
+    total_prem = create_rel_df(500)['Premium'].sum()
     # print(get_relativity(a, b))
     # claims = find_total_claim_amt(50)
