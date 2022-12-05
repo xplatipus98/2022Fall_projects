@@ -276,6 +276,10 @@ def bin_relativity(rel_list: list) -> list:
     This function bins the relativity values at different integer levels to be used for fitting to various distributions
     :rel_list: a list of relativity values
     :return: List of binned relativity values
+    >>> type(bin_relativity([1, 2, 3]))
+    <class 'list'>
+    >>> bin_relativity([10, 2.1, 3.7, 4.9, 1, 0, 2.4])
+    [10, 5, 8, 9, 1, 1, 5]
     """
     rel_int: list[int] = []
     for value in rel_list:
@@ -302,10 +306,12 @@ def bin_relativity(rel_list: list) -> list:
     return rel_int
 
 
-def find_sd() -> list:
+def find_sd() -> dict:
     """
     This function calculates the standard deviation of each bucket
-    :return: a list with standard deviations of each bucket
+    :return: a dictionary with standard deviations of each bucket
+    >>> type(find_sd())
+    <class 'dict'>
     """
     info_dict, agg_list = dict_generator()
     sd_dict = {}
@@ -343,6 +349,8 @@ def create_rel_df(n):
     premium or not.
     :param n: number of customers
     :return: dataframe with individual customer data
+    >>> type(create_rel_df(10))
+    <class 'pandas.core.frame.DataFrame'>
     """
     c_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless',
                'Driving_History_speeding', 'Credit_Score',
@@ -364,8 +372,11 @@ def create_rel_df(n):
         Calculates threshold premium for each customer based on his/her age.
         :param row: data of each customer
         :return: threshold premium (int)
+
         """
         if row['Age'] == 1:
+            return 2800
+        elif row['Age'] == 1.2:
             return 3500
         elif row['Age'] == 1.2:
             return 5000
