@@ -32,7 +32,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator() -> tuple[dict, dict]:
+def dict_generator() -> [dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -267,8 +267,10 @@ def find_claim_severity(coverage_relativity: list) -> float:
     for claim_severity_level, coverage_bucket in coverage_bucket_dict.items():
         if coverage_relativity == coverage_bucket:
             claim_level = int(claim_severity_level)
-            claim_val = int(get_truncated_normal(mean=statistics.mean([0, claim_level]), sd=statistics.stdev([0, claim_level]), low=0, upp=claim_level).rvs())
-#           claim_val = np.random.normal(statistics.mean([0, claim_level]), statistics.stdev([0, claim_level]))
+            claim_val = int(
+                get_truncated_normal(mean=statistics.mean([0, claim_level]), sd=statistics.stdev([0, claim_level]),
+                                     low=0, upp=claim_level).rvs())
+    #           claim_val = np.random.normal(statistics.mean([0, claim_level]), statistics.stdev([0, claim_level]))
     return round(claim_val, 2)
 
 
@@ -375,14 +377,19 @@ def create_rel_df(n):
         :return: threshold premium (int)
 
         """
-        if row['Age'] == 1:
-            return 3800
-        elif row['Age'] == 1.2:
-            return 5500
-        elif row['Age'] == 1.15:
-            return 5000
+        rel_agg = row['Combine_relativity_per_customer']
+        if 1 <= rel_agg < 2:
+            return 4200
+        elif 2 <= rel_agg < 3:
+            return 5120
+        elif 3 <= rel_agg < 4:
+            return 6800
+        elif 4 <= rel_agg < 5:
+            return 8200
+        elif 5 <= rel_agg < 6:
+            return 9900
         else:
-            return 6000
+            return 11000
 
     df['Threshold_premium'] = df.apply(lambda row: threshold_calculator(row), axis=1)
     print("increasing premiums now..........................")
@@ -404,7 +411,7 @@ def increase_premiums(df, n):
     temp_list = []
     # total customers, base profits, total premium ---->graph of profit up and no of customers down
     while profit >= temp:
-        df['Premium'] = df['Premium'] * 1.01
+        df['Premium'] = df['Premium'] * 1.1
 
         def customer_churn(row):
             """
@@ -417,6 +424,7 @@ def increase_premiums(df, n):
                 return 1
             else:
                 return 0
+
         df['Customer_dropped'] = df.apply(lambda row: customer_churn(row), axis=1)
         df_retained_cust = df[df['Customer_dropped'] == 0]
         sum_premium = df_retained_cust['Premium'].sum()
@@ -468,6 +476,6 @@ if __name__ == '__main__':
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
     print(create_rel_df(100))
-    #total_prem = create_rel_df(500)['Premium'].sum()
+    # total_prem = create_rel_df(500)['Premium'].sum()
     # print(get_relativity(a, b))
     # claims = find_total_claim_amt(50)
