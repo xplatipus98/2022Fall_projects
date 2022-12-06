@@ -32,7 +32,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator() -> [dict, dict]:
+def dict_generator() -> tuple[dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -375,7 +375,6 @@ def create_rel_df(n):
         Calculates threshold premium for each customer based on his/her age.
         :param row: data of each customer
         :return: threshold premium (int)
-
         """
         rel_agg = row['Combine_relativity_per_customer']
         if 1 <= rel_agg < 2:
@@ -409,9 +408,9 @@ def increase_premiums(df, n):
     print("Initial Profit: {}".format(profit))
     temp = profit
     temp_list = []
-    # total customers, base profits, total premium ---->graph of profit up and no of customers down
     while profit >= temp:
-        df['Premium'] = df['Premium'] * 1.1
+        print("increasing premium by $50")
+        df['Premium'] = df['Premium'] + 50
 
         def customer_churn(row):
             """
@@ -420,11 +419,11 @@ def increase_premiums(df, n):
             :param row: data of each customer (one row of the dataframe)
             :return: boolean (1/0)
             """
-            if row['Threshold_premium'] < row['Premium']:
+            drop_probability = random.randint(0, 1)
+            if row['Threshold_premium'] < row['Premium'] and drop_probability > 0.5:
                 return 1
             else:
                 return 0
-
         df['Customer_dropped'] = df.apply(lambda row: customer_churn(row), axis=1)
         df_retained_cust = df[df['Customer_dropped'] == 0]
         sum_premium = df_retained_cust['Premium'].sum()
@@ -432,41 +431,9 @@ def increase_premiums(df, n):
         temp_list.append(temp)
         profit = sum_premium - sum_claim
         print(df['Customer_dropped'].value_counts())
-    print("Profit later: {}".format(temp_list))
+    df.to_csv("test.csv")
+    print("The profit of the company increased from {} to {}.".format(round(temp_list[0], 2), round(temp_list[-1], 2)))
     return df
-
-
-# UNUSED FUNCTIONS BLOCK
-def calculate_premium(df):
-    baseline_premium = 1600
-    df['Relativity'] = df['Age'] * df['Driving_History_DUI'] * df['Driving_History_reckless'] * \
-                       df['Driving_History_speeding'] * df['Credit_Score'] * df['Years_of_Driving'] * df['Location'] * \
-                       df['Insurance_History'] * df['Annual_Mileage'] * df['Marital_Status'] * df['Claims_History'] * \
-                       df['Coverage_level'] * df['Deductible'] * df['Vehicle']
-    df['Calculated_premium'] = baseline_premium * df['Relativity']
-    print(df['Relativity'].head(20))
-
-
-def create_df(number_of_customers):
-    column_names = ['Age', 'Driving_History_DUI', 'Driving_History_reckless', 'Driving_History_speeding' 'Credit_Score',
-                    'Years_of_Driving', 'Location', 'Insurance_History', 'Annual_Mileage', 'Marital_Status',
-                    'Claims_History', 'Coverage_level', 'Deductible', 'Vehicle']
-    fm_dataframe = pd.DataFrame(columns=column_names)
-    for i in range(0, number_of_customers):
-        data = []
-        for info_dict in dict_generator():
-            x = np.random.randint(0, len(info_dict))
-            value = list(info_dict.values())[x]
-            data.append(value)
-        fm_dataframe = fm_dataframe.append(
-            {"Age": data[0], "Driving_History_DUI": data[1], "Driving_History_reckless": data[2],
-             "Driving_History_speeding": data[3], "Credit_Score": data[4],
-             "Years_of_Driving": data[5], "Location": data[6], "Insurance_History": data[7],
-             "Annual_Mileage": data[8], "Marital_Status": data[9],
-             "Claims_History": data[10], "Coverage_level": data[11], "Deductible": data[12],
-             "Vehicle": data[13]}, ignore_index=True)
-    # print(fm_dataframe.head())
-    calculate_premium(fm_dataframe)
 
 
 if __name__ == '__main__':
@@ -475,7 +442,7 @@ if __name__ == '__main__':
     # find_claim_severity(1)
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
-    print(create_rel_df(100))
+    create_rel_df(500)
     # total_prem = create_rel_df(500)['Premium'].sum()
     # print(get_relativity(a, b))
     # claims = find_total_claim_amt(50)
