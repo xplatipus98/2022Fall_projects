@@ -267,7 +267,8 @@ def find_claim_severity(coverage_relativity: list) -> float:
     for claim_severity_level, coverage_bucket in coverage_bucket_dict.items():
         if coverage_relativity == coverage_bucket:
             claim_level = int(claim_severity_level)
-            claim_val = np.random.normal(statistics.mean([0, claim_level]), statistics.stdev([0, claim_level]))
+            claim_val = int(get_truncated_normal(mean=statistics.mean([0, claim_level]), sd=statistics.stdev([0, claim_level]), low=0, upp=claim_level).rvs())
+#           claim_val = np.random.normal(statistics.mean([0, claim_level]), statistics.stdev([0, claim_level]))
     return round(claim_val, 2)
 
 
@@ -402,7 +403,7 @@ def increase_premiums(df, n):
     temp = profit
     temp_list = []
     # total customers, base profits, total premium ---->graph of profit up and no of customers down
-    while profit >= temp and profit > 0:
+    while profit >= temp:
         df['Premium'] = df['Premium'] * 1.01
 
         def customer_churn(row):
@@ -467,6 +468,6 @@ if __name__ == '__main__':
     a, b = dict_generator()
     # print(len(get_relativity(a, b)))
     print(create_rel_df(100))
-    total_prem = create_rel_df(500)['Premium'].sum()
+    #total_prem = create_rel_df(500)['Premium'].sum()
     # print(get_relativity(a, b))
     # claims = find_total_claim_amt(50)
