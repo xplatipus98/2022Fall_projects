@@ -101,6 +101,7 @@ def get_age_relativity(age_dict: dict, agg_age_dict: dict) -> float:
         agg_age_dict["45-60 years"] += 1
     elif 60 < random_age:
         relativity = age_dict["60+ years"]
+        agg_age_dict["60+ years"] += 1
     return relativity
 
 
@@ -354,7 +355,7 @@ def create_rel_df(n):
         per_cust_data['Combine_relativity_per_customer'] = rel[i]
         per_cust_data['Premium'] = p_per_cust[i]
         df.loc[i] = per_cust_data
-
+    print(agg_dict)
     # threshold_1, threshold_2, threshold_3, threshold_4 = 0
     def threshold_calculator(row):
         """
