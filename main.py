@@ -380,7 +380,7 @@ def create_rel_df(n):
     df['Threshold_premium'] = df.apply(lambda row: threshold_calculator(row), axis=1)
     print("increasing premiums now..........................")
     df = increase_premiums(df, n)
-    return df
+    return agg_dict
 
 
 def increase_premiums(df, n):
@@ -427,7 +427,7 @@ if __name__ == '__main__':
     # cal_relativity(5000)
     # optimize_profit(1000)
     # find_claim_severity(1)
-    a, b = dict_generator()
+    #a, b = dict_generator()
     # print(len(get_relativity(a, b)))
     create_rel_df(500)
     # total_prem = create_rel_df(500)['Premium'].sum()
