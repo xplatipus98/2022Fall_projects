@@ -1,6 +1,11 @@
 ## 2022 - Fall_projects 
 ### FINANCIAL MODELING OF INSURANCE COMPANY (AUTO INSURANCE) USING MONTE CARLO SIMULATION
 
+Team Members:
+Antara chansarkar
+Saket Naik
+Sparsh Sadafal
+
 Factors to consider - 
 1. Age (18-24: 1.5, 25-45: 1, 45-60: 1.3, 60+: 1.6)
 2. Driving History (DUI: 1.2 if yes, Reckless Driving: 1.1 if yes, Speeding ticket: 1.05 if yes in past one year : Yes/No) 
@@ -14,10 +19,8 @@ Factors to consider -
 10. Coverage level (10k-20k: , .......30k-40k: 1, ....., 140k-150k, 150k+)
 11. Deductible (No deductible: 1.2, 250$:1, 500$: 0.9, 1000$: 0.8)
 12. Vehicle (NCAP rating- 0: 1.15, 1: 1.1, 2: 1.05, 3: 1, 4: 0.95, 5: 0.9)
- 
 
 Scenario and Purpose:
-
 
 
 1. Decide which variables to generate using pseudo random generator: claims amount, claims probability

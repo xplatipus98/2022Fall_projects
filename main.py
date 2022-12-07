@@ -13,9 +13,6 @@ import numpy as np
 from scipy.stats.distributions import poisson
 from scipy.stats import truncnorm
 import statistics
-import warnings
-
-warnings.filterwarnings("ignore")
 
 
 def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
@@ -32,7 +29,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10) -> float:
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def dict_generator() -> tuple[dict, dict]:
+def dict_generator() -> [dict, dict]:
     """
     This function generates a list of dictionary with key as the bucket of that variable and value as its
     relativity
@@ -74,9 +71,7 @@ def dict_generator() -> tuple[dict, dict]:
     for key in aggregate_dict:
         for k in aggregate_dict[key]:
             aggregate_dict[key][k] = 0
-    # print(information_dict)
-    # print(get_relativity(information_dict, aggregate_dict))
-    # print(aggregate_dict)
+
     return information_dict, aggregate_dict
 
 
@@ -92,8 +87,7 @@ def get_age_relativity(age_dict: dict, agg_age_dict: dict) -> float:
     >>> get_age_relativity(a['age'], b['age']) not in [1.2, 1, 1.15, 1.25]
     False
     """
-    # agg_age_dict = {"18-24 years": 0, "25-45 years": 0, "45-60 years": 0,
-    #            "60+ years": 0}
+
     relativity = 1
     random_age = int(get_truncated_normal(mean=40, sd=20, low=18, upp=80).rvs())
     if 18 <= random_age < 25:
@@ -122,8 +116,7 @@ def get_credit_relativity(credit_dict: dict, agg_credit_dict: dict) -> float:
     >>> get_credit_relativity(c['credit_score'], ac['credit_score']) not in [1.2,  1.1,  1, 0.95, 0.88]
     False
     """
-    # agg_credit_score = {"300-579": 0, "580-669": 0, "670-739": 0,
-    #               "740-799": 0, "800-850": 0}
+
     relativity = 1
     random_credit = int(get_truncated_normal(mean=700, sd=100, low=350, upp=850).rvs())
     if 300 <= random_credit < 580:
@@ -232,8 +225,7 @@ def cal_relativity(no_cust: int):
         relativities.append(relativity_per_customer)
         premium_per_customer.append(base_premium * relativity_per_customer)
         total_premium = total_premium + (base_premium * relativity_per_customer)
-    # print(relativities)
-    # print("Total premium: {}".format(total_premium))
+
     return relativities, round(total_premium, 3), coverage_levels, premium_per_customer
 
 
@@ -251,8 +243,7 @@ def find_total_claim_amt(no_cust: int) -> float:
     for coverage_rel in coverages_rel:
         coverage_val = find_claim_severity(coverage_rel)
         claim_sev.append(coverage_val)
-    # print("Frequency Probabilities: {}".format(freq_prob))
-    # print("Claim severity: {}".format(claim_sev))
+
     total_claim_amount = sum([x * y for x, y in zip(freq_prob, claim_sev)])
     return round(total_claim_amount, 3)
 
@@ -270,7 +261,6 @@ def find_claim_severity(coverage_relativity: list) -> float:
             claim_val = int(
                 get_truncated_normal(mean=statistics.mean([0, claim_level]), sd=statistics.stdev([0, claim_level]),
                                      low=0, upp=claim_level).rvs())
-    #           claim_val = np.random.normal(statistics.mean([0, claim_level]), statistics.stdev([0, claim_level]))
     return round(claim_val, 2)
 
 
@@ -330,11 +320,7 @@ def optimize_profit(no_of_cust: int):
     :param no_of_cust: The number of customers in the customer pool
     :return: Total p/l from premium
     """
-    # n = 1
-    # info_dict, agg_dict = dict_generator()
-    # rel_dict = get_relativity(info_dict, agg_dict)
-    # sd = find_sd()
-    # # for v in range(len(rel_dict)):"""
+
     total_revenue_from_premium = cal_relativity(no_of_cust)[1]
     print("Total revenue earned from insurance premium: {}".format(total_revenue_from_premium))
     total_claim_val = find_total_claim_amt(no_of_cust)
