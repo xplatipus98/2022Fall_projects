@@ -6,21 +6,32 @@ Antara chansarkar
 Saket Naik
 Sparsh Sadafal
 
-Factors to consider - 
-1. Age (18-24: 1.5, 25-45: 1, 45-60: 1.3, 60+: 1.6)
-2. Driving History (DUI: 1.2 if yes, Reckless Driving: 1.1 if yes, Speeding ticket: 1.05 if yes in past one year : Yes/No) 
-3. Credit Score (300-579: 1.2, 580-669: 1.1, 670-739: 1, 740-799: 0.95, 800-850: 0.88)
-4. Years of driving (less than 1: 1.1 , 1-5: 1.05, 6-15: 1, 15+: 0.97) 
-5. Location (Urban: 1.05, Rural: 0.97, Suburban: 1)
-6. Insurance History (Continuous coverage over past 6 months: 1.05,Continuous coverage over past 1 year: 1, Continuous coverage over past 3+ years: 0.95, No previous coverage: 1.2)
-7. Annual Mileage (0-7500: 1, 7500-10000: 1.1, 10000-15000: 1.15, 15000+: 1.2)(The amount that you drive)
-8. Marital Status (Married: 0.95, Single/Divorced/Widowed: 1)
-9. Claims History (Filed within last one year: 1.3, 1-3 years: 1.2, No claims filed: 1)
-10. Coverage level (10k-20k: , .......30k-40k: 1, ....., 140k-150k, 150k+)
-11. Deductible (No deductible: 1.2, 250$:1, 500$: 0.9, 1000$: 0.8)
-12. Vehicle (NCAP rating- 0: 1.15, 1: 1.1, 2: 1.05, 3: 1, 4: 0.95, 5: 0.9)
+In this project, we aim to find out the optimum price of an Auto insurance product using Monte Carlo Simulation. We simulated random insurance customers and demand of elasticity to maintain a balance between premium increase and resulting customer attrition.
 
-Scenario and Purpose:
+Below are the characteristics we considered to determine premium of a customers- 
+1. Age
+2. Driving History  
+3. Credit Score 
+4. Years of driving  
+5. Location 
+6. Insurance History 
+7. Annual Mileage 
+8. Marital Status 
+9. Claims History 
+10. Coverage level
+11. Deductible 
+12. Vehicle 
 
+Methodology:
+1. Set relativity values for each of the characteristics mentioned above to find total premium
+2. Generate users with ramdom values of the above variables
+3. Multiply the relativity values of the users with the base premium to find out individual premium
+4. Find out the total claims using claims frequency and severity with gaussian distribution and truncated normal distribution
+5. Set a threshold for customer attrition and increase the value of base premium
+6. Calculated the customer attrition and profit after increased premium
+7. Keep increasing premium until optimum premium with minimum customer attrition is obtained
 
-1. Decide which variables to generate using pseudo random generator: claims amount, claims probability
+Instructions:
+1. Run the main function
+2. Run the viz.ipynb notebook for visualizations and result
+
